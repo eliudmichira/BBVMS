@@ -1,0 +1,24 @@
+{
+  "users": [
+    {
+      "id": "162c0bac-60c2-467c-aea2-848bff150f1b",
+      "nationalId": "40034119",
+      "passwordHash": "49dab764c4bc965361a7f1392b0b1c3234f26581b059ce4dd8f2b5085f09e55bdf0386bd3fedd9fe9564567d0b88cc8e6138b13e5745b52f0b9baf8217e32afd",
+      "passwordSalt": "fb279b659cfaf741220a046edab84cb4",
+      "walletAddress": "0x577a71aeae2c21d56b0c99d1e7c568fcc2391587",
+      "created": "2025-03-23T06:50:10.778Z",
+      "lastLogin": "2025-03-23T16:16:34.938Z",
+      "role": "voter"
+    },
+    {
+      "id": "efd92bea-ad86-4209-8ceb-d3242614fb97",
+      "nationalId": "344119",
+      "passwordHash": "fe6d45424b111be1c6b5b3c7e6c44f0bc8a242a632140c0e4252e7789c21089c96c8038f80197b484d38f1f067cc2ee80aa839f75fb4a1c54c9eeed8fe242950",
+      "passwordSalt": "c9d72351ffb4df3635573958ab54431e",
+      "walletAddress": "0x0b26432e4c0a4db3bcea7feff8e11f66468731f5",
+      "created": "2025-03-23T06:53:40.946Z",
+      "lastLogin": "2025-03-27T00:03:09.212Z",
+      "role": "admin"
+    }
+  ]
+}

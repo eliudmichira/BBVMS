@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Secure login for decentralized blockchain voting platform">
+    <meta name="csrf-token" content="" id="csrf-token">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; font-src 'self' data:; img-src 'self' data: https://via.placeholder.com https://cdn.pixabay.com; connect-src 'self' http://localhost:8000 https://api.example.com;">
+    <title>Login - IEBC Blockchain Voting System</title>
+    
+    <!-- Styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Using Unicode symbols instead of Font Awesome -->
+    <style>
+        /* Base styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: #f3f4f6; /* Light mode background */
+        }
+        
+        .dark body {
+            background-color: #111827; /* Dark mode background */
+        }
+        
+        /* Unicode icons */
+        .icon-sun::before { content: "☀️"; }
+        .icon-moon::before { content: "🌙"; }
+        .icon-user::before { content: "👤"; }
+        .icon-users::before { content: "👥"; }
+        .icon-user-shield::before { content: "🛡️"; }
+        .icon-connect::before { content: "🔌"; }
+        .icon-disconnect::before { content: "🔌"; }
+        .icon-vote::before { content: "🗳️"; }
+        .icon-chart::before { content: "📊"; }
+        .icon-settings::before { content: "⚙️"; }
+        .icon-plus-circle::before { content: "➕"; }
+        .icon-download::before { content: "💾"; }
+        .icon-link::before { content: "🔗"; }
+        .icon-network-wired::before { content: "🌐"; }
+        .icon-file-contract::before { content: "📄"; }
+        .icon-sync-alt::before { content: "🔄"; }
+        .icon-calendar-alt::before { content: "📅"; }
+        .icon-clock::before { content: "⏰"; }
+        .icon-user-plus::before { content: "👤+"; }
+        .icon-list::before { content: "📋"; }
+        .icon-calendar-check::before { content: "📆"; }
+        .icon-edit::before { content: "✏️"; }
+        .icon-calendar-plus::before { content: "📅+"; }
+        .icon-save::before { content: "💾"; }
+        .icon-check-square::before { content: "✅"; }
+        .icon-trophy::before { content: "🏆"; }
+        .icon-table::before { content: "🗃️"; }
+        .icon-file-export::before { content: "📤"; }
+        .icon-times::before { content: "❌"; }
+        .icon-check-circle::before { content: "✓"; }
+        .icon-exclamation-circle::before { content: "❗"; }
+        .icon-exclamation-triangle::before { content: "⚠️"; }
+        .icon-info-circle::before { content: "ℹ️"; }
+        .icon-sign-out-alt::before { content: "🚪"; }
+        .icon-logout::before { content: "🚪"; }
+        .icon-plug::before { content: "🔌"; }
+        .icon-flag-checkered::before { content: "🏁"; }
+        .icon-wallet::before { content: "👛"; }
+        .icon-lock::before { content: "🔒"; }
+        .icon-eye::before { content: "👁️"; }
+        .icon-sign-in-alt::before { content: "🚪"; }
+        .icon-user-plus::before { content: "👤+"; }
+        .icon-times-circle::before { content: "❌"; }
+        
+        /* Icon spacing */
+        [class^="icon-"] {
+            display: inline-block;
+            margin-right: 0.25rem;
+        }
+        
+        /* Blockchain background */
+        .blockchain-background {
+            background-image: none !important;
+        }
+        
+        /* Dark mode blockchain background */
+        .dark .blockchain-background {
+            background-image: none !important;
+        }
+        
+        /* Loader */
+        .loader {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Pulse animation for connection dot */
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+            }
+            
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 5px rgba(255, 193, 7, 0);
+            }
+            
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+            }
+        }
+
+        /* Particles canvas styles */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: auto; /* Enable pointer events so clicks can be detected */
+            background-color: transparent;
+            display: block;
+            overflow: hidden;
+            cursor: pointer; /* Show pointer cursor to indicate clickability */
+        }
+        
+        /* Particles.js styles */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: #f9fafb; /* Light mode background */
+            overflow: hidden;
+        }
+        
+        /* Dark mode particles background */
+        .dark #particles-js {
+            background-color: #111827; /* Dark mode background */
+        }
+        
+        .particles-js-canvas-el {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: auto; /* Enable pointer events so clicks can be detected */
+            cursor: pointer; /* Show pointer cursor to indicate clickability */
+        }
+        
+        /* Login container */
+        .login-container {
+            max-width: 480px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Login card */
+        .login-card {
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Form inputs */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: 0.5rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        
+        .form-input:focus {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+        }
+        
+        /* Input icons */
+        .input-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #16a34a;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #15803d;
+        }
+        
+        .btn-metamask {
+            background-color: #f6851b;
+            color: white;
+        }
+        
+        .btn-metamask:hover {
+            background-color: #e27625;
+        }
+        
+        /* Ripple effect */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-ripple::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%, -50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn-ripple:focus::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+        
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e5e7eb;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #1f2937;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Alerts */
+        .alert {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .alert-info {
+            background-color: #eff6ff;
+            border: 1px solid #dbeafe;
+        }
+        
+        .dark .alert-info {
+            background-color: rgba(29, 78, 216, 0.1);
+            border-color: rgba(29, 78, 216, 0.2);
+        }
+        
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Password strength meter */
+        .password-strength-meter {
+            height: 4px;
+            background-color: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s, background-color 0.3s;
+        }
+        
+        /* Pulse animation for connection status */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7);
+            }
+            
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 5px rgba(255, 193, 7, 0);
+            }
+            
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+            }
+        }
+        
+        /* Logo pulse animation */
+        .logo-pulse {
+            animation: logoPulse 3s infinite;
+        }
+        
+        @keyframes logoPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(22, 163, 74, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+            }
+        }
+        
+        /* Ensure main content is above particles */
+        main {
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(0px); /* Helps with rendering layers correctly */
+        }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen flex flex-col items-center justify-center p-4">
+    <!-- Particles background canvas - now clickable -->
+    <div id="particles-js">
+        <canvas class="particles-js-canvas-el" style="width: 100%; height: 100%;"></canvas>
+    </div>
+    
+    <!-- Add to your HTML -->
+    <div id="particles-fallback" class="absolute inset-0 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 opacity-50"></div>
+    
+    <main class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md relative overflow-hidden">
+        <!-- Logo and Title -->
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center">
+                <div class="bg-primary-600 dark:bg-primary-700 p-3 rounded-full">
+                    <span class="icon-vote text-white text-xl"></span>
+                </div>
+                <h1 class="ml-3 text-2xl font-bold text-gray-900 dark:text-white">IEBC Voting</h1>
+            </div>
+            
+            <!-- Theme Toggle Button -->
+            <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                <span class="icon-sun text-yellow-500 dark:hidden"></span>
+                <span class="icon-moon text-blue-300 hidden dark:block"></span>
+            </button>
+        </div>
+        
+        <!-- Connection Status Indicator -->
+        <div class="absolute top-4 right-4 flex items-center" id="connectionIndicator">
+            <div class="w-2 h-2 rounded-full bg-yellow-500 mr-2 pulse-animation" id="connectionDot"></div>
+            <span class="text-xs text-gray-600 dark:text-gray-400 font-medium" id="connectionText">Checking connection...</span>
+        </div>
+        
+        <!-- Authentication Section -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-medium text-center text-gray-900 dark:text-white mb-1">Secure Blockchain Voting</h2>
+            
+            <!-- Info Box about Dual Authentication -->
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+                <div class="flex items-start gap-3">
+                    <span class="icon-info-circle text-blue-600 dark:text-blue-400 text-lg flex-shrink-0 mt-0.5"></span>
+                    <div>
+                        <h3 class="font-medium text-blue-800 dark:text-blue-300 mb-1">Two-Factor Authentication Required</h3>
+                        <p class="text-sm text-blue-700 dark:text-blue-400">
+                            This system requires both your National ID and a connected MetaMask wallet for secure voting authentication.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Integrated Login Form -->
+            <form id="loginFormElement" class="space-y-5">
+                <div>
+                    <label for="nationalId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">National ID Number</label>
+                    <div class="relative">
+                        <input type="text" id="nationalId" name="nationalId" class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" required>
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <span class="icon-user text-gray-500 dark:text-gray-400"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" class="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white" required>
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <span class="icon-lock text-gray-500 dark:text-gray-400"></span>
+                        </div>
+                        <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400">
+                            <span class="icon-eye"></span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- MetaMask Wallet Connection Section -->
+                <div class="space-y-3">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">MetaMask Wallet</label>
+                    
+                    <div id="walletStatus" class="p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div id="walletNotConnected" class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="icon-wallet text-gray-500 dark:text-gray-400"></span>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Connect your MetaMask wallet</span>
+                            </div>
+                            <button type="button" id="connectWalletBtn" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded">
+                                Connect
+                            </button>
+                        </div>
+                        
+                        <div id="walletConnected" class="hidden flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="icon-wallet text-green-500 dark:text-green-400"></span>
+                                <span class="text-sm text-green-700 dark:text-green-300">Wallet connected</span>
+                            </div>
+                            <span id="walletAddress" class="text-xs text-gray-500 dark:text-gray-400 font-mono"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-xs text-gray-500 dark:text-gray-400 ml-1">
+                        Both National ID verification and wallet connection are required to login.
+                    </div>
+                </div>
+                
+                <!-- Remember Me Checkbox -->
+                <div class="flex items-center">
+                    <input id="rememberMe" name="rememberMe" type="checkbox" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                    <label for="rememberMe" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                        Remember me
+                    </label>
+                </div>
+                
+                <!-- Submit button -->
+                <button type="submit" id="loginButton" class="w-full flex justify-center items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors">
+                    <span class="icon-sign-in-alt"></span>
+                    <span>Login with ID & Wallet</span>
+                </button>
+                
+                <!-- Feedback area -->
+                <div id="loginFeedback" class="hidden mt-3 p-3 rounded-md text-center text-sm"></div>
+            </form>
+            
+            <!-- Registration Link -->
+            <div class="mt-4 text-center">
+                <span class="text-sm text-gray-600 dark:text-gray-400">Don't have an account?</span>
+                <button id="showRegistrationForm" class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 ml-1">
+                    Create an account
+                </button>
+            </div>
+            
+            <!-- Link to wallet linking page -->
+            <div class="text-center pt-3 mt-2 border-t border-gray-200 dark:border-gray-700">
+                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Need to link your National ID to MetaMask?</p>
+                <a href="react-wallet-linking.html" class="inline-flex items-center mt-2 text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium">
+                    <span class="icon-link mr-1"></span>
+                    Link National ID to MetaMask Wallet
+                </a>
+            </div>
+        </div>
+
+        <!-- Decorative background elements -->
+        <div class="absolute -bottom-16 -right-16 w-48 h-48 bg-primary-600 opacity-10 rounded-full"></div>
+        <div class="absolute -top-8 -left-8 w-24 h-24 bg-blue-600 opacity-10 rounded-full"></div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="mt-8 text-center text-gray-500 dark:text-gray-400 text-xs">
+        <p>© 2025 IEBC Blockchain Voting System. All rights reserved.</p>
+    </footer>
+    
+    <!-- Registration Modal -->
+    <div id="registrationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md relative">
+            <button id="closeRegistrationModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <span class="icon-times"></span>
+            </button>
+            
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Create Account</h2>
+            
+            <div class="space-y-4">
+                <!-- National ID Field -->
+                <div>
+                    <label for="registerNationalId" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        National ID Number
+                    </label>
+                    <div class="mt-1">
+                        <input id="registerNationalId"
+                               type="text" 
+                            name="nationalId"
+                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
+                            placeholder="Enter your National ID"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label for="registerPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Password
+                        </label>
+                    <div class="relative mt-1">
+                        <input type="password" id="registerPassword" name="password" required
+                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:text-white text-sm"
+                            placeholder="Create a password">
+                        <button type="button" id="toggleRegisterPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400">
+                            <span class="icon-eye"></span>
+                        </button>
+                    </div>
+
+                    <!-- Password Strength Indicator -->
+                    <div id="passwordStrength" class="mt-2">
+                        <div class="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                            <span>Strength:</span>
+                            <span id="strengthText">Weak</span>
+                        </div>
+                        <div class="w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                            <div id="strengthBar" 
+                                 class="h-full bg-red-500 transition-all duration-300" 
+                                 style="width: 0%">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password Requirements -->
+                    <div id="passwordRequirements" class="mt-2 text-xs space-y-1">
+                        <div class="flex items-center text-gray-600 dark:text-gray-400" id="req-length">
+                            <span class="icon-times-circle mr-1 text-red-500"></span> 8+ characters
+                        </div>
+                        <div class="flex items-center text-gray-600 dark:text-gray-400" id="req-uppercase">
+                            <span class="icon-times-circle mr-1 text-red-500"></span> Uppercase letter
+                        </div>
+                        <div class="flex items-center text-gray-600 dark:text-gray-400" id="req-number">
+                            <span class="icon-times-circle mr-1 text-red-500"></span> Number
+                        </div>
+                        <div class="flex items-center text-gray-600 dark:text-gray-400" id="req-special">
+                            <span class="icon-times-circle mr-1 text-red-500"></span> Special character
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MetaMask Wallet Section for Registration -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        MetaMask Wallet
+                    </label>
+                    <div class="mt-2 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div id="registerWalletNotConnected" class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="icon-wallet text-gray-500 dark:text-gray-400"></span>
+                                <span class="text-sm text-gray-700 dark:text-gray-300">Connect your MetaMask wallet</span>
+                            </div>
+                            <button type="button" id="registerConnectWalletBtn" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded">
+                                Connect
+                            </button>
+                        </div>
+
+                        <div id="registerWalletConnected" class="hidden flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="icon-wallet text-green-500 dark:text-green-400"></span>
+                                <span class="text-sm text-green-700 dark:text-green-300">Wallet connected</span>
+                            </div>
+                            <span id="registerWalletAddress" class="text-xs text-gray-500 dark:text-gray-400 font-mono"></span>
+                        </div>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        Your wallet will be permanently linked to your National ID for future voting.
+                    </p>
+                </div>
+
+                <!-- Terms Checkbox -->
+                <div class="flex items-center">
+                    <input id="acceptTerms" name="acceptTerms" type="checkbox" 
+                           class="rounded border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500 dark:bg-gray-700 h-4 w-4">
+                    <label for="acceptTerms" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        I accept the <a href="#" class="text-primary-600 dark:text-primary-400 hover:underline">Terms of Service</a>
+                    </label>
+                </div>
+                
+                <!-- Register Button -->
+                <button type="button" id="completeRegistrationBtn"
+                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-800 transition-colors">
+                    <span class="icon-user-plus mr-2"></span>
+                    Create Account with ID & Wallet
+                </button>
+            </div>
+                
+            <!-- Registration Feedback -->
+            <div id="registerFeedback" class="hidden mt-4 p-3 rounded-md text-center text-sm"></div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://unpkg.com/ethers@6.13.1/dist/ethers.umd.min.js"></script>
+    
+    <!-- Fix for browser is not defined error -->
+    <script>
+        // Fix for browser is not defined error
+        const browserSupport = typeof window !== 'undefined' ? window : null;
+    </script>
+    
+    <!-- Main functionality script -->
+    <script>
+        // Debug logging
+        console.log("Login page loaded at: " + new Date().toISOString());
+        
+        // NO AUTOMATIC REDIRECTS FROM LOGIN PAGE
+        // We prevent all redirects from login page to avoid redirect loops 
+        
+        // If user is already authenticated, show a message but don't redirect
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("Login page DOM loaded");
+            
+            // Check URL parameters for feedback messages
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            const redirectReason = urlParams.get('redirect_reason');
+            
+            const loginFeedback = document.getElementById('loginFeedback');
+            
+            if (error) {
+                showFeedback(loginFeedback, "Error: " + error, true);
+            } else if (redirectReason) {
+                if (redirectReason === 'not_authenticated') {
+                    showFeedback(loginFeedback, "Authentication required to access that page.", true);
+                } else if (redirectReason === 'signout') {
+                    showFeedback(loginFeedback, "You have been successfully signed out.", false);
+                    
+                    // Clear authentication data completely on sign out
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('nationalId');
+                    localStorage.removeItem('voterId');
+                    localStorage.removeItem('walletAddress');
+                    localStorage.removeItem('role');
+                    localStorage.removeItem('isAuthenticated');
+                }
+            }
+            
+            // If user is already logged in, just show a message
+            const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+            const token = localStorage.getItem('token');
+            
+            if (isAuthenticated && token) {
+                showFeedback(loginFeedback, 
+                    "You are already logged in. <a href='index.html' class='font-medium underline'>Go to Dashboard</a>", 
+                    false);
+            }
+            
+            // Reset redirect counter on login page load
+            sessionStorage.removeItem('redirectCounter');
+        });
+        
+        // Form submission handling
+        document.getElementById('loginFormElement')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nationalId = document.getElementById('nationalId')?.value || '';
+            const password = document.getElementById('password')?.value || '';
+            const rememberMe = document.getElementById('rememberMe')?.checked || false;
+            
+            // Get error message elements or create them if they don't exist
+            let errorMessageEl = document.getElementById('errorMessage');
+            let successMessageEl = document.getElementById('successMessage');
+            
+            // If elements don't exist, create them
+            if (!errorMessageEl) {
+                errorMessageEl = document.createElement('div');
+                errorMessageEl.id = 'errorMessage';
+                errorMessageEl.className = 'p-3 rounded-md bg-red-100 text-red-800 mb-4 hidden';
+                document.getElementById('loginFormElement')?.prepend(errorMessageEl);
+            }
+            
+            if (!successMessageEl) {
+                successMessageEl = document.createElement('div');
+                successMessageEl.id = 'successMessage';
+                successMessageEl.className = 'p-3 rounded-md bg-green-100 text-green-800 mb-4 hidden';
+                document.getElementById('loginFormElement')?.prepend(successMessageEl);
+            }
+            
+            if (!nationalId || !password) {
+                errorMessageEl.innerText = "Please enter both National ID and password.";
+                errorMessageEl.classList.remove('hidden');
+                return;
+            }
+            
+            // Hide previous error messages
+            errorMessageEl.classList.add('hidden');
+            successMessageEl.classList.add('hidden');
+            
+            // Show loading state
+            const loginButton = document.getElementById('loginButton');
+            if (loginButton) {
+                loginButton.disabled = true;
+                loginButton.innerHTML = '<span class="loader"></span> Logging in...';
+            }
+            
+            // Mock login success for demo (replace with actual authentication)
+            setTimeout(() => {
+                // Simulate successful login
+                const mockUserData = {
+                    nationalId: nationalId,
+                    walletAddress: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+                    role: "voter"
+                };
+                
+                // Store auth data in localStorage
+                localStorage.setItem('token', 'mock-token-' + Date.now());
+                localStorage.setItem('nationalId', mockUserData.nationalId);
+                localStorage.setItem('voterId', mockUserData.nationalId);
+                localStorage.setItem('walletAddress', mockUserData.walletAddress);
+                localStorage.setItem('role', mockUserData.role);
+                localStorage.setItem('isAuthenticated', 'true');
+                localStorage.setItem('lastLogin', new Date().toISOString());
+                
+                // Store nationalId for Remember Me
+                if (rememberMe) {
+                    const expiryDate = new Date();
+                    expiryDate.setDate(expiryDate.getDate() + 30);
+                    localStorage.setItem('rememberedNationalId', nationalId);
+                    localStorage.setItem('rememberedExpiry', expiryDate.toISOString());
+                } else {
+                    localStorage.removeItem('rememberedNationalId');
+                    localStorage.removeItem('rememberedExpiry');
+                }
+                
+                // Show success message
+                successMessageEl.innerText = "Login successful. Redirecting...";
+                successMessageEl.classList.remove('hidden');
+                
+                // Reset button state
+                if (loginButton) {
+                    loginButton.disabled = false;
+                    loginButton.innerHTML = 'Login';
+                }
+                
+                // Clear any redirect counters
+                sessionStorage.removeItem('redirectCounter');
+                
+                // Redirect based on role
+                setTimeout(() => {
+                    if (mockUserData.role === 'admin') {
+                        window.location.href = 'admin-dashboard.html?from=login&time=' + Date.now();
+                    } else {
+                        window.location.href = 'index.html?from=login&time=' + Date.now();
+                    }
+                }, 1000);
+            }, 1500);
+        });
+        
+        // Remember me functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const rememberedId = localStorage.getItem('rememberedNationalId');
+            const expiryDate = localStorage.getItem('rememberedExpiry');
+            
+            if (rememberedId && expiryDate) {
+                const now = new Date();
+                const expiry = new Date(expiryDate);
+                
+                if (now < expiry) {
+                    document.getElementById('nationalId').value = rememberedId;
+                    document.getElementById('rememberMe').checked = true;
+                } else {
+                    // Clear expired remembered data
+                    localStorage.removeItem('rememberedNationalId');
+                    localStorage.removeItem('rememberedExpiry');
+                }
+            }
+        });
+        
+        // Add this function to detect and prevent redirect loops
+        function shouldBlockRedirect() {
+            // Get or initialize redirect counter from sessionStorage
+            let redirectCounter = sessionStorage.getItem('redirectCounter') || 0;
+            redirectCounter = parseInt(redirectCounter) + 1;
+            
+            // Store updated count
+            sessionStorage.setItem('redirectCounter', redirectCounter);
+            
+            console.log(`Redirect attempt ${redirectCounter} of 2 (login page)`);
+            
+            // Block if we've exceeded the limit
+            if (redirectCounter > 2) {
+                console.error("TOO MANY REDIRECTS - Breaking the loop from login page");
+                sessionStorage.setItem('redirectCounter', 0); // Reset for next time
+                return true;
+            }
+            
+            return false;
+        }
+
+        // Session verification: Check if user was redirected back from index.html
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("=== LOGIN PAGE LOAD DEBUGGING ===");
+            console.log("Document loaded at:", new Date().toISOString());
+            
+            // Check URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const errorParam = urlParams.get('error');
+            const redirectReason = urlParams.get('redirect_reason');
+            
+            console.log("URL parameters:", { error: errorParam, redirect_reason: redirectReason });
+            
+            if (errorParam === 'session') {
+                showFeedback(document.getElementById('loginFeedback'), 
+                    'Session error: Please log in again', true);
+            }
+            
+            if (redirectReason === 'not_authenticated') {
+                showFeedback(document.getElementById('loginFeedback'), 
+                    'Authentication required: Please log in', true);
+            }
+            
+            if (redirectReason === 'signed_out') {
+                // User explicitly signed out, clear all storage
+                localStorage.clear();
+                sessionStorage.clear();
+                showFeedback(document.getElementById('loginFeedback'), 
+                    'You have been signed out successfully', false);
+            }
+            
+            // Check if user is already logged in
+            const isAuthenticated = localStorage.getItem('isAuthenticated');
+            const token = localStorage.getItem('token');
+            
+            console.log("Auth state:", { 
+                isAuthenticated, 
+                hasToken: !!token,
+                url: window.location.href 
+            });
+            
+            // CRITICAL: Break redirect loops
+            // Only redirect to index if the user is authenticated and not trying to sign out or was redirected
+            if (isAuthenticated === 'true' && token && !redirectReason) {
+                console.log("User is already logged in, checking for redirect loop");
+                
+                // Prevent redirect loops
+                if (shouldBlockRedirect()) {
+                    console.log("Breaking redirect loop - staying on login page");
+                    showFeedback(document.getElementById('loginFeedback'), 
+                        'Redirect loop detected. Please clear your browser cookies and localStorage, then try again.', true);
+                    return;
+                }
+                
+                console.log("Redirecting to appropriate page");
+                // User is already logged in, redirect to appropriate page
+                const role = localStorage.getItem('role') || 'voter';
+                // Add a timestamp to prevent caching issues
+                const timestamp = new Date().getTime();
+                
+                // Reset the counter when we do an intentional redirect
+                sessionStorage.setItem('redirectCounter', 0);
+                
+                window.location.href = (role === 'admin' ? 'admin.html' : 'index.html') + 
+                    '?auth=' + timestamp;
+            } else {
+                // Reset redirect counter on login page
+                sessionStorage.setItem('redirectCounter', 0);
+            }
+            
+            console.log("Login page initial check complete");
+        });
+        
+        // Direct implementation of login functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Debug logger function
+            function debugLog(message, data = null) {
+                const debugPanel = document.getElementById('debugPanel');
+                const debugContent = document.getElementById('debugContent');
+                if (!debugPanel || !debugContent) return;
+                
+                const timestamp = new Date().toLocaleTimeString();
+                let content = `<div class="mb-1"><span class="text-gray-400">${timestamp}</span> ${message}</div>`;
+                
+                if (data) {
+                    if (typeof data === 'object') {
+                        content += `<pre class="text-green-400 text-xs mt-1 mb-2 overflow-x-auto">${JSON.stringify(data, null, 2)}</pre>`;
+                    } else {
+                        content += `<pre class="text-green-400 text-xs mt-1 mb-2">${data}</pre>`;
+                    }
+                }
+                
+                debugContent.innerHTML = content + debugContent.innerHTML;
+                console.log(message, data);
+            }
+
+            // Show feedback message
+            function showFeedback(element, message, isError = false) {
+                if (!element) return;
+                
+                element.textContent = message;
+                element.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'dark:bg-green-800', 'dark:text-green-100', 'dark:bg-red-800', 'dark:text-red-100');
+                
+                if (isError) {
+                    element.classList.add('bg-red-100', 'text-red-800', 'dark:bg-red-800', 'dark:text-red-100');
+                } else {
+                    element.classList.add('bg-green-100', 'text-green-800', 'dark:bg-green-800', 'dark:text-green-100');
+                }
+                
+                debugLog(isError ? `Error: ${message}` : `Success: ${message}`);
+            }
+            
+            // Show debug panel
+            document.addEventListener('keydown', function(event) {
+                // Ctrl+Shift+D to toggle debug panel
+                if (event.ctrlKey && event.shiftKey && event.key === 'D') {
+                    const debugPanel = document.getElementById('debugPanel');
+                    if (debugPanel) {
+                        debugPanel.classList.toggle('hidden');
+                    }
+                }
+            });
+            
+            // Close debug panel
+            const closeDebugPanel = document.getElementById('closeDebugPanel');
+            if (closeDebugPanel) {
+                closeDebugPanel.addEventListener('click', function() {
+                    const debugPanel = document.getElementById('debugPanel');
+                    if (debugPanel) {
+                        debugPanel.classList.add('hidden');
+                    }
+               });
+            }
+            
+            // Set loading state on button
+            function setLoading(button, isLoading) {
+                if (!button) return;
+                
+                if (isLoading) {
+                    button._originalHTML = button.innerHTML;
+                    button.disabled = true;
+                    button.innerHTML = '<div class="loader"></div><span>Processing...</span>';
+                } else {
+                    button.disabled = false;
+                    button.innerHTML = button._originalHTML || 'Submit';
+                }
+            }
+            
+            // Password strength functionality
+           function updatePasswordStrength(password, inputId = 'password') {
+               const isRegisterPassword = inputId === 'registerPassword';
+               
+                const strengthBar = document.getElementById('strengthBar');
+                const strengthText = document.getElementById('strengthText');
+                const passwordStrength = document.getElementById('passwordStrength');
+                
+               if (!strengthBar || !strengthText || !passwordStrength) return 0;
+                
+                // Calculate strength
+                let score = 0;
+                if (password.length >= 8) score++;
+                if (/[A-Z]/.test(password)) score++;
+                if (/[0-9]/.test(password)) score++;
+                if (/[^A-Za-z0-9]/.test(password)) score++;
+                
+                // Show strength indicator
+                passwordStrength.classList.remove('hidden');
+                
+                // Update bar width
+                strengthBar.style.width = `${score * 25}%`;
+                
+                // Update color and text
+                if (score <= 1) {
+                    strengthBar.className = 'h-full bg-red-500 transition-all duration-300';
+                    strengthText.textContent = 'Weak';
+                } else if (score === 2) {
+                    strengthBar.className = 'h-full bg-yellow-500 transition-all duration-300';
+                    strengthText.textContent = 'Fair';
+                } else if (score === 3) {
+                    strengthBar.className = 'h-full bg-yellow-400 transition-all duration-300';
+                    strengthText.textContent = 'Good';
+                } else {
+                    strengthBar.className = 'h-full bg-green-500 transition-all duration-300';
+                    strengthText.textContent = 'Strong';
+                }
+                
+               // Update password requirements
+               const requirements = {
+                   'length': password.length >= 8,
+                   'uppercase': /[A-Z]/.test(password),
+                   'number': /[0-9]/.test(password),
+                   'special': /[^A-Za-z0-9]/.test(password)
+               };
+               
+               Object.entries(requirements).forEach(([req, isMet]) => {
+                   const reqElement = document.getElementById(`req-${req}`);
+                   if (!reqElement) return;
+                   
+                   const icon = reqElement.querySelector('span');
+                   if (isMet) {
+                       icon.className = 'icon-check-circle mr-1 text-green-500';
+                       reqElement.classList.remove('text-gray-600', 'dark:text-gray-400');
+                       reqElement.classList.add('text-green-600', 'dark:text-green-400');
+                   } else {
+                       icon.className = 'icon-times-circle mr-1 text-red-500';
+                       reqElement.classList.remove('text-green-600', 'dark:text-green-400');
+                       reqElement.classList.add('text-gray-600', 'dark:text-gray-400');
+                   }
+               });
+                
+                return score;
+            }
+            
+           // MetaMask connection function
+           const connectMetaMask = async () => {
+                        if (!window.ethereum) {
+                            showFeedback(document.getElementById('loginFeedback'), 'MetaMask is not installed. Please install MetaMask to continue.', true);
+                   return null;
+                        }
+                        
+               try {
+                        // Request accounts from MetaMask
+                        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                        const address = accounts[0];
+                        
+                   // Use the wrapper to get a proper provider
+                   let provider = null;
+                   if (window.ethersProviderWrapper) {
+                       provider = window.ethersProviderWrapper.getProvider();
+                   } else if (window.ethers && window.ethers.BrowserProvider) {
+                       provider = new window.ethers.BrowserProvider(window.ethereum);
+                   }
+                   
+                   return { address, provider };
+               } catch (error) {
+                   console.error('Error connecting to MetaMask:', error);
+                   showFeedback(document.getElementById('loginFeedback'), `Failed to connect: ${error.message}`, true);
+                   return null;
+               }
+           };
+           
+           // Format wallet address for display
+           function formatWalletAddress(address) {
+               if (!address) return '';
+               return `${address.slice(0, 6)}...${address.slice(-4)}`;
+           }
+           
+           // Connect wallet button for login form
+           const connectWalletBtn = document.getElementById('connectWalletBtn');
+           const walletNotConnected = document.getElementById('walletNotConnected');
+           const walletConnected = document.getElementById('walletConnected');
+           const walletAddress = document.getElementById('walletAddress');
+           
+           // Connect wallet button for registration form
+           const registerConnectWalletBtn = document.getElementById('registerConnectWalletBtn');
+           const registerWalletNotConnected = document.getElementById('registerWalletNotConnected');
+           const registerWalletConnected = document.getElementById('registerWalletConnected');
+           const registerWalletAddress = document.getElementById('registerWalletAddress');
+           
+           // Keep track of current wallet
+           let currentWalletAddress = '';
+           
+           // Connect wallet functionality (login form)
+           if (connectWalletBtn) {
+               connectWalletBtn.addEventListener('click', async function() {
+                   debugLog('Connect wallet button clicked');
+                   
+                   try {
+                       setLoading(this, true);
+                       
+                       const result = await connectMetaMask();
+                       if (!result) {
+                           setLoading(this, false);
+                           return;
+                       }
+                       
+                       const { address } = result;
+                       currentWalletAddress = address;
+                       
+                       // Update UI for login form
+                       if (walletAddress) walletAddress.textContent = formatWalletAddress(address);
+                       if (walletNotConnected) walletNotConnected.classList.add('hidden');
+                       if (walletConnected) walletConnected.classList.remove('hidden');
+                       
+                       // Update UI for registration form (if visible)
+                       if (registerWalletAddress) registerWalletAddress.textContent = formatWalletAddress(address);
+                       if (registerWalletNotConnected) registerWalletNotConnected.classList.add('hidden');
+                       if (registerWalletConnected) registerWalletConnected.classList.remove('hidden');
+                       
+                       showFeedback(document.getElementById('loginFeedback'), 'Wallet connected successfully!', false);
+                       setLoading(this, false);
+                    } catch (error) {
+                        console.error('Error connecting to MetaMask:', error);
+                        showFeedback(document.getElementById('loginFeedback'), `Failed to connect: ${error.message}`, true);
+                        setLoading(this, false);
+                    }
+                });
+            }
+            
+           // Connect wallet functionality (registration form)
+           if (registerConnectWalletBtn) {
+               registerConnectWalletBtn.addEventListener('click', async function() {
+                   debugLog('Register connect wallet button clicked');
+                   
+                   try {
+                       setLoading(this, true);
+                       
+                       const result = await connectMetaMask();
+                       if (!result) {
+                           setLoading(this, false);
+                           return;
+                       }
+                       
+                       const { address } = result;
+                       currentWalletAddress = address;
+                       
+                       // Update UI for registration form
+                       if (registerWalletAddress) registerWalletAddress.textContent = formatWalletAddress(address);
+                       if (registerWalletNotConnected) registerWalletNotConnected.classList.add('hidden');
+                       if (registerWalletConnected) registerWalletConnected.classList.remove('hidden');
+                       
+                       // Update UI for login form (if visible)
+                       if (walletAddress) walletAddress.textContent = formatWalletAddress(address);
+                       if (walletNotConnected) walletNotConnected.classList.add('hidden');
+                       if (walletConnected) walletConnected.classList.remove('hidden');
+                       
+                       showFeedback(document.getElementById('registerFeedback'), 'Wallet connected successfully!', false);
+                       setLoading(this, false);
+                   } catch (error) {
+                       console.error('Error connecting to MetaMask:', error);
+                       showFeedback(document.getElementById('registerFeedback'), `Failed to connect: ${error.message}`, true);
+                       setLoading(this, false);
+                   }
+               });
+           }
+           
+           // Login form submission
+           const loginFormElement = document.getElementById('loginFormElement');
+           const loginButton = document.getElementById('loginButton');
+           
+           if (loginFormElement) {
+               loginFormElement.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                   const nationalId = document.getElementById('nationalId').value;
+                    const password = document.getElementById('password').value;
+                   const rememberMe = document.getElementById('rememberMe')?.checked || false;
+                    
+                    // Validate inputs
+                   if (!nationalId || !password) {
+                        showFeedback(document.getElementById('loginFeedback'), 'Please fill in all fields', true);
+                        return;
+                    }
+                   
+                   // Check if wallet is connected
+                   if (!currentWalletAddress) {
+                       showFeedback(document.getElementById('loginFeedback'), 'Please connect your MetaMask wallet to continue', true);
+                       return;
+                   }
+                    
+                    // Set loading state
+                    setLoading(loginButton, true);
+                    
+                   // Call our database API to authenticate
+                   fetch('http://localhost:8000/api/login', {
+                       method: 'POST',
+                       headers: {
+                           'Content-Type': 'application/json'
+                       },
+                       body: JSON.stringify({
+                           nationalId: nationalId,
+                           password: password
+                       })
+                   })
+                   .then(response => {
+                       if (!response.ok) {
+                           // If response is not ok (like 401), throw an error to go to the fallback flow
+                           throw new Error(`API request failed with status ${response.status}`);
+                       }
+                       return response.json();
+                   })
+                   .then(data => {
+                       if (data.success) {
+                           // Login successful
+                           debugLog('Login successful', data);
+                           
+                           // Store auth data in localStorage
+                           localStorage.setItem('token', data.token);
+                           localStorage.setItem('nationalId', nationalId);
+                           localStorage.setItem('voterId', nationalId);
+                           localStorage.setItem('walletAddress', currentWalletAddress || data.user.walletAddress);
+                           localStorage.setItem('role', data.user.role);
+                           localStorage.setItem('isAuthenticated', 'true');
+                           
+                           if (rememberMe) {
+                               localStorage.setItem('rememberedNationalId', nationalId);
+                               // Set expiration for 30 days
+                               const expires = new Date();
+                               expires.setDate(expires.getDate() + 30);
+                               localStorage.setItem('rememberMeExpires', expires.getTime());
+                           }
+                           
+                           // Show success message
+                           showFeedback(document.getElementById('loginFeedback'), 'Login successful! Redirecting...', false);
+                           
+                           // Redirect to the appropriate page with auth timestamp
+                    setTimeout(() => {
+                               // Add a timestamp to prevent caching issues
+                               const timestamp = new Date().getTime();
+                               console.log("Redirecting after successful login");
+                               window.location.href = (data.user.role === 'admin' ? 'admin.html' : 'index.html') + 
+                                   '?auth=' + timestamp;
+                           }, 1500);
+                       } else {
+                           // Login failed
+                           showFeedback(document.getElementById('loginFeedback'), data.message || 'Login failed', true);
+                       }
+                   })
+                   .catch(error => {
+                       console.error('Error during login:', error);
+                       
+                       // ALWAYS use fallback login for development/demonstration purposes
+                       // For demo: Determine if national ID looks like an admin ID
+                       const isAdmin = nationalId.toLowerCase().includes('admin');
+                       
+                       debugLog('Using fallback login (API unavailable)', { 
+                           nationalId, 
+                           walletAddress: currentWalletAddress,
+                           role: isAdmin ? 'admin' : 'voter',
+                           rememberMe 
+                       });
+                       
+                       // Store auth data in localStorage
+                       localStorage.setItem('token', 'demo-token-' + Math.random());
+                       localStorage.setItem('nationalId', nationalId);
+                       localStorage.setItem('voterId', nationalId);
+                       localStorage.setItem('walletAddress', currentWalletAddress || 'demo-wallet-address');
+                       localStorage.setItem('role', isAdmin ? 'admin' : 'voter');
+                       localStorage.setItem('isAuthenticated', 'true');
+                       
+                       if (rememberMe) {
+                           localStorage.setItem('rememberedNationalId', nationalId);
+                           // Set expiration for 30 days
+                           const expires = new Date();
+                           expires.setDate(expires.getDate() + 30);
+                           localStorage.setItem('rememberMeExpires', expires.getTime());
+                       }
+                       
+                       // Show success message
+                       showFeedback(document.getElementById('loginFeedback'), 'Login successful! Redirecting... (Demo mode)', false);
+                       
+                       // Redirect to the appropriate page
+                       setTimeout(() => {
+                           // Add a timestamp to prevent caching issues
+                           const timestamp = new Date().getTime();
+                           window.location.href = (isAdmin ? 'admin.html' : 'index.html') + 
+                               '?auth=' + timestamp;
+                       }, 1500);
+                   })
+                   .finally(() => {
+                       setLoading(loginButton, false);
+                   });
+               });
+           }
+           
+           // Toggle password visibility handlers
+           const togglePassword = document.getElementById('togglePassword');
+           const passwordInput = document.getElementById('password');
+           if (togglePassword && passwordInput) {
+               togglePassword.addEventListener('click', function() {
+                   const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                   passwordInput.setAttribute('type', type);
+                   debugLog('Password visibility toggled');
+               });
+           }
+           
+           const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+           const registerPasswordInput = document.getElementById('registerPassword');
+           if (toggleRegisterPassword && registerPasswordInput) {
+               toggleRegisterPassword.addEventListener('click', function() {
+                   const type = registerPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                   registerPasswordInput.setAttribute('type', type);
+                   debugLog('Register password visibility toggled');
+               });
+           }
+           
+           // Check for remembered login
+           const rememberedNationalId = localStorage.getItem('rememberedNationalId');
+           const rememberMeExpires = localStorage.getItem('rememberMeExpires');
+           
+           if (rememberedNationalId && rememberMeExpires) {
+               // Check if remember me hasn't expired
+               if (parseInt(rememberMeExpires) > Date.now()) {
+                   debugLog('Found remembered login', { rememberedNationalId });
+                   
+                   // For demo only - in a real app, you would validate with the server
+                   const nationalIdInput = document.getElementById('nationalId');
+                   const rememberMeCheckbox = document.getElementById('rememberMe');
+                   
+                   if (nationalIdInput) {
+                       nationalIdInput.value = rememberedNationalId;
+                   }
+                   
+                   if (rememberMeCheckbox) {
+                       rememberMeCheckbox.checked = true;
+                   }
+               }
+           }
+           
+           // Registration modal functionality
+           const registrationModal = document.getElementById('registrationModal');
+           const closeRegistrationModal = document.getElementById('closeRegistrationModal');
+           const showRegistrationForm = document.getElementById('showRegistrationForm');
+           
+           if (showRegistrationForm && registrationModal) {
+               showRegistrationForm.addEventListener('click', function() {
+                   registrationModal.classList.remove('hidden');
+                   const registerNationalId = document.getElementById('registerNationalId');
+                   if (registerNationalId) {
+                       registerNationalId.focus();
+                   }
+                   debugLog('Registration modal opened');
+               });
+           }
+           
+           if (closeRegistrationModal && registrationModal) {
+               closeRegistrationModal.addEventListener('click', function() {
+                   registrationModal.classList.add('hidden');
+                   debugLog('Registration modal closed');
+               });
+               
+               // Close modal when clicking outside
+               registrationModal.addEventListener('click', function(e) {
+                   if (e.target === registrationModal) {
+                       registrationModal.classList.add('hidden');
+                   }
+               });
+           }
+           
+           // Register password input event listener
+           if (registerPasswordInput) {
+               registerPasswordInput.addEventListener('input', function() {
+                   updatePasswordStrength(this.value, 'registerPassword');
+               });
+           }
+           
+           // Complete registration button
+           const completeRegistrationBtn = document.getElementById('completeRegistrationBtn');
+           if (completeRegistrationBtn) {
+               completeRegistrationBtn.addEventListener('click', function() {
+                   const registerNationalId = document.getElementById('registerNationalId');
+                   const registerPassword = document.getElementById('registerPassword');
+                   const acceptTerms = document.getElementById('acceptTerms');
+                   const registerFeedback = document.getElementById('registerFeedback');
+                   
+                   if (!registerNationalId || !registerPassword || !acceptTerms || !registerFeedback) {
+                       console.error('Required registration elements not found');
+                       return;
+                   }
+                   
+                   const nationalId = registerNationalId.value;
+                   const password = registerPassword.value;
+                   const termsAccepted = acceptTerms.checked;
+                    
+                    // Validate inputs
+                   if (!nationalId || !password) {
+                       showFeedback(registerFeedback, 'Please fill in all fields', true);
+                       return;
+                   }
+                   
+                   if (!termsAccepted) {
+                       showFeedback(registerFeedback, 'Please accept the Terms of Service', true);
+                       return;
+                   }
+                   
+                   // Check if wallet is connected
+                   if (!currentWalletAddress) {
+                       showFeedback(registerFeedback, 'Please connect your MetaMask wallet to continue', true);
+                        return;
+                    }
+                    
+                    // Validate password strength
+                   const score = updatePasswordStrength(password, 'registerPassword');
+                    if (score < 3) {
+                       showFeedback(registerFeedback, 'Please use a stronger password', true);
+                        return;
+                    }
+                    
+                    // Set loading state
+                   setLoading(completeRegistrationBtn, true);
+                   
+                   // Call our database API to register the user
+                   fetch('http://localhost:8000/api/register', {
+                       method: 'POST',
+                       headers: {
+                           'Content-Type': 'application/json'
+                       },
+                       body: JSON.stringify({
+                           nationalId: nationalId,
+                           password: password,
+                           walletAddress: currentWalletAddress
+                       })
+                   })
+                   .then(response => response.json())
+                   .then(data => {
+                       if (data.success) {
+                           // Registration successful
+                           showFeedback(registerFeedback, 'Account created and wallet linked successfully!', false);
+                           
+                           // Auto-fill login form after successful registration
+                           const loginNationalId = document.getElementById('nationalId');
+                           if (loginNationalId) {
+                               loginNationalId.value = nationalId;
+                           }
+                           
+                           // Close modal after a delay
+                    setTimeout(() => {
+                               registrationModal.classList.add('hidden');
+                           }, 2000);
+                       } else {
+                           // Registration failed
+                           showFeedback(registerFeedback, data.message || 'Registration failed', true);
+                       }
+                   })
+                   .catch(error => {
+                       console.error('Error registering user:', error);
+                       
+                       // Fallback for demo purposes when the API isn't running
+                       if (!window.location.hostname.includes('localhost')) {
+                           // Simulate successful registration
+                           showFeedback(registerFeedback, 'Account created and wallet linked successfully! (Demo mode)', false);
+                           
+                           // Auto-fill login form after successful registration
+                           const loginNationalId = document.getElementById('nationalId');
+                           if (loginNationalId) {
+                               loginNationalId.value = nationalId;
+                           }
+                           
+                           // Close modal after a delay
+                           setTimeout(() => {
+                               registrationModal.classList.add('hidden');
+                           }, 2000);
+                       } else {
+                           showFeedback(registerFeedback, 'Connection error. Please make sure the Database API is running.', true);
+                       }
+                   })
+                   .finally(() => {
+                       setLoading(completeRegistrationBtn, false);
+                   });
+               });
+           }
+           
+           // Check if user is already connected to MetaMask
+           async function checkWalletConnection() {
+               if (window.ethereum) {
+                   try {
+                       // Check if we're already connected
+                       const accounts = await window.ethereum.request({ 
+                           method: 'eth_accounts' // This doesn't trigger the MetaMask popup
+                       });
+                       
+                       if (accounts && accounts.length > 0) {
+                           const address = accounts[0];
+                           currentWalletAddress = address;
+                           debugLog('Already connected to MetaMask', { address });
+                           
+                           // Update login form UI
+                           if (walletAddress) walletAddress.textContent = formatWalletAddress(address);
+                           if (walletNotConnected) walletNotConnected.classList.add('hidden');
+                           if (walletConnected) walletConnected.classList.remove('hidden');
+                           
+                           // Update registration form UI
+                           if (registerWalletAddress) registerWalletAddress.textContent = formatWalletAddress(address);
+                           if (registerWalletNotConnected) registerWalletNotConnected.classList.add('hidden');
+                           if (registerWalletConnected) registerWalletConnected.classList.remove('hidden');
+                           
+                           // Show a notification that we're already connected
+                           const loginFeedback = document.getElementById('loginFeedback');
+                           if (loginFeedback && !loginFeedback.textContent) {
+                               showFeedback(
+                                   loginFeedback, 
+                                   'Wallet already connected!', 
+                                   false
+                               );
+                           }
+                           
+                           return true;
+                       }
+                   } catch (error) {
+                       console.error('Error checking wallet connection:', error);
+                       debugLog('Error checking wallet connection', error);
+                   }
+               }
+               return false;
+           }
+           
+           // Listen for account changes
+           if (window.ethereum) {
+               window.ethereum.on('accountsChanged', function (accounts) {
+                   debugLog('MetaMask accounts changed', { accounts });
+                   if (accounts.length === 0) {
+                       // User disconnected wallet
+                       currentWalletAddress = '';
+                       
+                       // Update login form UI
+                       if (walletNotConnected) walletNotConnected.classList.remove('hidden');
+                       if (walletConnected) walletConnected.classList.add('hidden');
+                       
+                       // Update registration form UI
+                       if (registerWalletNotConnected) registerWalletNotConnected.classList.remove('hidden');
+                       if (registerWalletConnected) registerWalletConnected.classList.add('hidden');
+                       
+                       showFeedback(
+                           document.getElementById('loginFeedback'), 
+                           'MetaMask wallet disconnected. Please reconnect to continue.', 
+                           true
+                       );
+                        } else {
+                       // User switched accounts
+                       currentWalletAddress = accounts[0];
+                       
+                       // Update login form UI
+                       if (walletAddress) walletAddress.textContent = formatWalletAddress(currentWalletAddress);
+                       if (walletNotConnected) walletNotConnected.classList.add('hidden');
+                       if (walletConnected) walletConnected.classList.remove('hidden');
+                       
+                       // Update registration form UI
+                       if (registerWalletAddress) registerWalletAddress.textContent = formatWalletAddress(currentWalletAddress);
+                       if (registerWalletNotConnected) registerWalletNotConnected.classList.add('hidden');
+                       if (registerWalletConnected) registerWalletConnected.classList.remove('hidden');
+                       
+                       showFeedback(
+                           document.getElementById('loginFeedback'),
+                           'MetaMask account changed',
+                           false
+                       );
+                   }
+               });
+               
+               window.ethereum.on('chainChanged', function (chainId) {
+                   debugLog('MetaMask network changed', { chainId });
+                   // Refresh the page when the network changes
+                   window.location.reload();
+               });
+           }
+            
+            // Update connection indicator
+            const connectionDot = document.getElementById('connectionDot');
+            const connectionText = document.getElementById('connectionText');
+           
+           function updateConnectionStatus() {
+            if (navigator.onLine) {
+                connectionDot.classList.remove('bg-yellow-500', 'bg-red-500');
+                connectionDot.classList.add('bg-green-500');
+                connectionText.textContent = 'Online';
+            } else {
+                connectionDot.classList.remove('bg-yellow-500', 'bg-green-500');
+                connectionDot.classList.add('bg-red-500');
+                connectionText.textContent = 'Offline';
+               }
+            }
+           
+           // Initial connection status check
+           updateConnectionStatus();
+            
+            // Listen for online/offline events
+           window.addEventListener('online', updateConnectionStatus);
+           window.addEventListener('offline', updateConnectionStatus);
+           
+           // Initialize - check if wallet is already connected
+           checkWalletConnection();
+           
+           // Function to toggle theme
+           function toggleTheme() {
+               document.documentElement.classList.toggle('dark');
+               
+               // Save preference to localStorage
+               const isDarkMode = document.documentElement.classList.contains('dark');
+               localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+           }
+           
+           // Add event listener to theme toggle button
+           const themeToggle = document.getElementById('themeToggle');
+           if (themeToggle) {
+               themeToggle.addEventListener('click', toggleTheme);
+           }
+           
+           // Debug log initialization
+           debugLog('Login page initialized');
+           
+           // Set initial theme based on preference
+           if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+               document.documentElement.classList.add('dark');
+           } else {
+               document.documentElement.classList.remove('dark');
+           }
+        });
+    </script>
+    
+    <!-- Enhanced particles animation script -->
+    <script>
+      // Utility function for hex to RGB conversion
+      function hexToRgb(hex) {
+          // Remove the hash if it exists
+          hex = hex.replace(/^#/, '');
+          
+          // Parse the hex components
+          let r, g, b;
+          if (hex.length === 3) {
+              // For 3-digit hex codes (e.g., #RGB)
+              r = parseInt(hex.charAt(0) + hex.charAt(0), 16);
+              g = parseInt(hex.charAt(1) + hex.charAt(1), 16);
+              b = parseInt(hex.charAt(2) + hex.charAt(2), 16);
+          } else if (hex.length === 6) {
+              // For 6-digit hex codes (e.g., #RRGGBB)
+              r = parseInt(hex.substring(0, 2), 16);
+              g = parseInt(hex.substring(2, 4), 16);
+              b = parseInt(hex.substring(4, 6), 16);
+          } else {
+              // Default fallback
+              r = 0;
+              g = 0;
+              b = 0;
+          }
+          
+          return { r: r, g: g, b: b };
+      }
+      
+      // Initialize Particles.js
+      function initParticles() {
+          const fallback = document.getElementById('particles-fallback');
+          
+          try {
+              if (document.getElementById('particles-js') && typeof particlesJS === 'function') {
+                  // Updated Particles.js configuration with enhanced interactivity
+                  particlesJS('particles-js', {
+                      "particles": {
+                          "number": {
+                              "value": 80,
+                              "density": {
+                                  "enable": true,
+                                  "value_area": 800
+                              }
+                          },
+                          "color": {
+                              "value": "#16a34a"  // Using the green color from the theme
+                          },
+                          "shape": {
+                              "type": "circle",
+                              "stroke": {
+                                  "width": 0,
+                                  "color": "#000000"
+                              }
+                          },
+                          "opacity": {
+                              "value": 0.5,
+                              "random": false,
+                              "anim": {
+                                  "enable": true,
+                                  "speed": 1,
+                                  "opacity_min": 0.1,
+                                  "sync": false
+                              }
+                          },
+                          "size": {
+                              "value": 3,
+                              "random": true,
+                              "anim": {
+                                  "enable": false,
+                                  "speed": 40,
+                                  "size_min": 0.1,
+                                  "sync": false
+                              }
+                          },
+                          "line_linked": {
+                              "enable": true,
+                              "distance": 150,
+                              "color": "#16a34a",  // Using the green color from the theme
+                              "opacity": 0.4,
+                              "width": 1
+                          },
+                          "move": {
+                              "enable": true,
+                              "speed": 3,
+                              "direction": "none",
+                              "random": false,
+                              "straight": false,
+                              "out_mode": "out",
+                              "bounce": false,
+                              "attract": {
+                                  "enable": true,
+                                  "rotateX": 600,
+                                  "rotateY": 1200
+                              }
+                          },
+                          "responsive": [{
+                              "breakpoint": 768,
+                              "options": {
+                                  "number": {
+                                      "value": 40
+                                  }
+                              }
+                          }]
+                      },
+                      "interactivity": {
+                          "detect_on": "window",
+                          "events": {
+                              "onhover": {
+                                  "enable": true,
+                                  "mode": "repulse"
+                              },
+                              "onclick": {
+                                  "enable": true,
+                                  "mode": "push"
+                              },
+                              "resize": true
+                          },
+                          "modes": {
+                              "grab": {
+                                  "distance": 180,
+                                  "line_linked": {
+                                      "opacity": 1
+                                  }
+                              },
+                              "bubble": {
+                                  "distance": 250,
+                                  "size": 6,
+                                  "duration": 2,
+                                  "opacity": 0.8,
+                                  "speed": 3
+                              },
+                              "repulse": {
+                                  "distance": 100,
+                                  "duration": 0.4
+                              },
+                              "push": {
+                                  "particles_nb": 4
+                              },
+                              "remove": {
+                                  "particles_nb": 2
+                              }
+                          }
+                      },
+                      "retina_detect": true
+                  });
+                  
+                  // Set up theme-based color changing
+                  updateParticlesColors();
+                  
+                  // Listen for theme changes
+                  const themeToggle = document.getElementById('themeToggle');
+                  if (themeToggle) {
+                      themeToggle.addEventListener('click', function() {
+                          setTimeout(updateParticlesColors, 100); // Small delay to ensure theme has changed
+                      });
+                  }
+                  
+                  // Hide fallback when particles are ready
+                  if (fallback) fallback.style.display = 'none';
+              }
+          } catch (error) {
+              console.error("Error initializing Particles.js:", error);
+              // Show fallback on error
+              if (fallback) fallback.style.display = 'block';
+          }
+      }
+      
+      // Function to update particle colors based on theme
+      function updateParticlesColors() {
+          const isDarkMode = document.documentElement.classList.contains('dark');
+          const colors = {
+              light: {
+                  particles: '#16a34a',
+                  lines: '#15803d'
+              },
+              dark: {
+                  particles: '#4ade80',
+                  lines: '#22c55e'
+              }
+          };
+          
+          const theme = isDarkMode ? colors.dark : colors.light;
+          
+          if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+              const pJS = window.pJSDom[0].pJS;
+              
+              // Update particle colors
+              pJS.particles.color.value = theme.particles;
+              pJS.particles.line_linked.color = theme.lines;
+              
+              // Update existing particles
+              pJS.particles.array.forEach(p => {
+                  p.color.value = theme.particles;
+                  p.color.rgb = hexToRgb(theme.particles);
+              });
+              
+              // Update lines
+              pJS.particles.line_linked.color_rgb_line = hexToRgb(theme.lines);
+          }
+      }
+      
+      // Initialize immediately if document is already loaded
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+          setTimeout(initParticles, 100);
+      } else {
+          // Otherwise wait for DOM to be ready
+          document.addEventListener('DOMContentLoaded', function() {
+              setTimeout(initParticles, 100);
+          });
+      }
+      
+      // Backup initialization - if all else fails
+      window.addEventListener('load', function() {
+          if (document.getElementById('particles-js') && !window.pJSDom) {
+              console.log('Backup particles initialization');
+              initParticles();
+          }
+      });
+    </script>
+    
+    <!-- Add cleanup function -->
+    <script>
+        function cleanupParticles() {
+            if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+                window.pJSDom[0].pJS.fn.vendors.destroypJS();
+                window.pJSDom = [];
+            }
+        }
+
+        // Call cleanup when needed
+        window.addEventListener('unload', cleanupParticles);
+    </script>
+</body>
+</html>

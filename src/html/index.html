@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.jsdelivr.net/npm/; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; font-src 'self' data:; img-src 'self' data: https://via.placeholder.com https://cdn.pixabay.com; connect-src 'self' http://localhost:8000 https://api.example.com;">
+    <title>Voting - Decentralized Blockchain Voting</title>
+    <!-- TODO: For production, install Tailwind CSS as a PostCSS plugin or use the Tailwind CLI -->
+    <!-- This CDN approach is only for development purposes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                            950: '#042f2e'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Using Unicode symbols instead of Font Awesome -->
+    <style>
+        /* Base styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+        
+        /* Particles canvas styles */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: auto; /* Enable pointer events so clicks can be detected */
+            background-color: transparent;
+            display: block;
+            overflow: hidden;
+            cursor: pointer; /* Show pointer cursor to indicate clickability */
+        }
+        
+        /* Particles.js styles */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: #f9fafb; /* Light mode background */
+            overflow: hidden;
+        }
+        
+        /* Dark mode particles background */
+        .dark #particles-js {
+            background-color: #111827; /* Dark mode background */
+        }
+        
+        .particles-js-canvas-el {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: auto; /* Enable pointer events so clicks can be detected */
+            cursor: pointer; /* Show pointer cursor to indicate clickability */
+        }
+        
+        /* Ensure main content is above particles */
+        main {
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(0px);
+        }
+
+        /* Add to your HTML */
+        #particles-fallback {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom right, rgba(22, 163, 74, 0.1), rgba(22, 163, 74, 0.05));
+            opacity: 0.5;
+            z-index: -1;
+        }
+        
+        /* Unicode icons */
+        .icon-sun::before { content: "☀️"; }
+        .icon-moon::before { content: "🌙"; }
+        .icon-user::before { content: "👤"; }
+        .icon-users::before { content: "👥"; }
+        .icon-user-shield::before { content: "🛡️"; }
+        .icon-connect::before { content: "🔌"; }
+        .icon-disconnect::before { content: "🔌"; }
+        .icon-vote::before { content: "🗳️"; }
+        .icon-chart::before { content: "📊"; }
+        .icon-settings::before { content: "⚙️"; }
+        .icon-plus-circle::before { content: "➕"; }
+        .icon-download::before { content: "💾"; }
+        .icon-link::before { content: "🔗"; }
+        .icon-network-wired::before { content: "🌐"; }
+        .icon-file-contract::before { content: "📄"; }
+        .icon-sync-alt::before { content: "🔄"; }
+        .icon-calendar-alt::before { content: "📅"; }
+        .icon-clock::before { content: "⏰"; }
+        .icon-user-plus::before { content: "👤+"; }
+        .icon-list::before { content: "📋"; }
+        .icon-calendar-check::before { content: "📆"; }
+        .icon-edit::before { content: "✏️"; }
+        .icon-calendar-plus::before { content: "📅+"; }
+        .icon-save::before { content: "💾"; }
+        .icon-check-square::before { content: "✅"; }
+        .icon-trophy::before { content: "🏆"; }
+        .icon-table::before { content: "🗃️"; }
+        .icon-file-export::before { content: "📤"; }
+        .icon-times::before { content: "❌"; }
+        .icon-check-circle::before { content: "✓"; }
+        .icon-exclamation-circle::before { content: "❗"; }
+        .icon-exclamation-triangle::before { content: "⚠️"; }
+        .icon-info-circle::before { content: "ℹ️"; }
+        .icon-sign-out-alt::before { content: "🚪"; }
+        .icon-logout::before { content: "🚪"; }
+        .icon-plug::before { content: "🔌"; }
+        .icon-flag-checkered::before { content: "🏁"; }
+        .icon-external-link-alt::before { content: "🔗"; }
+        .icon-users-slash::before { content: "👥❌"; }
+        .icon-circle::before { content: "⚪"; }
+        
+        /* Icon spacing */
+        [class^="icon-"] {
+            display: inline-block;
+            margin-right: 0.25rem;
+        }
+        
+        /* Blockchain background */
+        .blockchain-background {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100%" height="100%" fill="none"/><path d="M20,50 L35,35 L65,35 L80,50 L65,65 L35,65 Z" stroke="rgba(59, 130, 246, 0.1)" stroke-width="2" fill="none"/><circle cx="35" cy="35" r="3" fill="rgba(59, 130, 246, 0.1)"/><circle cx="65" cy="35" r="3" fill="rgba(59, 130, 246, 0.1)"/><circle cx="80" cy="50" r="3" fill="rgba(59, 130, 246, 0.1)"/><circle cx="65" cy="65" r="3" fill="rgba(59, 130, 246, 0.1)"/><circle cx="35" cy="65" r="3" fill="rgba(59, 130, 246, 0.1)"/><circle cx="20" cy="50" r="3" fill="rgba(59, 130, 246, 0.1)"/></svg>');
+            background-repeat: repeat;
+            background-size: 100px 100px;
+        }
+        
+        /* Dark mode blockchain background */
+        .dark .blockchain-background {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100%" height="100%" fill="none"/><path d="M20,50 L35,35 L65,35 L80,50 L65,65 L35,65 Z" stroke="rgba(59, 130, 246, 0.05)" stroke-width="2" fill="none"/><circle cx="35" cy="35" r="3" fill="rgba(59, 130, 246, 0.05)"/><circle cx="65" cy="35" r="3" fill="rgba(59, 130, 246, 0.05)"/><circle cx="80" cy="50" r="3" fill="rgba(59, 130, 246, 0.05)"/><circle cx="65" cy="65" r="3" fill="rgba(59, 130, 246, 0.05)"/><circle cx="35" cy="65" r="3" fill="rgba(59, 130, 246, 0.05)"/><circle cx="20" cy="50" r="3" fill="rgba(59, 130, 246, 0.05)"/></svg>');
+        }
+        
+        /* Loader */
+        .loader {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        .candidate-card {
+            transition: all 0.3s ease;
+        }
+        
+        .candidate-card:hover {
+            transform: translateY(-4px);
+        }
+        
+        .selected-candidate {
+            border: 2px solid #14b8a6;
+            box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.2);
+        }
+        
+        /* Debug panel styles */
+        #debugPanel {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 80%;
+            max-width: 600px;
+            height: 300px;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            padding: 10px;
+            z-index: 9999;
+            border-top-left-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        #debugContent {
+            height: 250px;
+            overflow-y: auto;
+        }
+        
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white min-h-screen blockchain-background">
+    <!-- Particles background -->
+    <div id="particles-js"></div>
+    <div id="particles-fallback"></div>
+    
+    <!-- Header with Navigation -->
+    <header class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-4 sticky top-0 z-10 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-2xl font-bold text-green-600 dark:text-green-400">Blockchain Voting</h1>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="tooltip">
+                    <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <span id="sunIcon" class="icon-sun text-yellow-500 inline-block"></span>
+                        <span id="moonIcon" class="icon-moon text-blue-300 hidden"></span>
+                    </button>
+                    <span class="tooltip-text">Toggle Dark Mode</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-2 py-1 px-3 bg-gray-100 dark:bg-gray-700 rounded-md">
+                    <div class="text-green-500 animate-pulse">
+                        <span class="icon-circle text-xs"></span>
+                    </div>
+                    <span id="walletAddress" class="text-sm font-mono truncate max-w-xs">Not connected</span>
+                </div>
+                
+                <button id="logoutButton" class="py-2 px-4 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors flex items-center">
+                    <span class="icon-sign-out-alt mr-2"></span>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-6 md:p-8">
+        <!-- Blockchain Connection Status -->
+        <div class="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+            <div class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
+                <h2 class="text-lg font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                    <span class="icon-network-wired mr-2 text-primary-500 dark:text-primary-400"></span>
+                    Blockchain Connection
+                </h2>
+            </div>
+            <div class="p-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="icon-network-wired mr-2 text-primary-500 dark:text-primary-400"></span>
+                            <p id="networkInfo" class="text-sm">Loading network information...</p>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="icon-file-contract mr-2 text-primary-500 dark:text-primary-400"></span>
+                            <p id="contractInfo" class="text-sm">Loading contract information...</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+                        <button id="connectButton" class="flex-1 py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors flex items-center justify-center">
+                            <span class="icon-link mr-2"></span>
+                            <span>Connect</span>
+                        </button>
+                        <button id="refreshButton" class="flex-1 py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors flex items-center justify-center">
+                            <span class="icon-sync-alt mr-2"></span>
+                            <span>Refresh Data</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Voting Panel -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-8">
+            <!-- Voting Status Alert -->
+            <div id="statusAlert" class="p-4 border-b hidden">
+                <div class="flex items-start">
+                    <div id="statusIcon" class="mr-3 flex-shrink-0 mt-0.5">
+                        <!-- Icon will be inserted by JavaScript -->
+                    </div>
+                    <div>
+                        <h3 id="statusTitle" class="text-sm font-medium"></h3>
+                        <p id="statusMessage" class="text-sm mt-1"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voting Period -->
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                        <span class="icon-calendar-alt mr-2"></span>
+                        Election Period
+                    </h2>
+                    <div id="electionBadge" class="px-3 py-1 text-xs font-medium rounded-full hidden">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+                
+                <div class="flex justify-center items-center">
+                    <div id="datesLoadingIndicator" class="loader"></div>
+                    <p id="datesDisplay" class="text-gray-700 dark:text-gray-300">Loading voting dates...</p>
+                </div>
+                
+                <!-- Progress bar for election -->
+                <div id="electionProgressContainer" class="mt-6 hidden">
+                    <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                        <span id="electionStartLabel"></span>
+                        <span id="electionEndLabel"></span>
+                    </div>
+                    <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div id="electionProgress" class="h-full rounded-full"></div>
+                    </div>
+                    <div class="mt-2 text-center text-sm">
+                        <span id="electionTimeRemaining"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidates Section -->
+            <div class="p-6">
+                <h2 class="text-xl font-semibold text-primary-700 dark:text-primary-300 mb-6 flex items-center">
+                    <span class="icon-users mr-2"></span>
+                    Candidates
+                </h2>
+                
+                <!-- Card-based candidate display -->
+                <div id="candidateCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <div class="col-span-full flex justify-center items-center py-12">
+                        <div class="loader"></div>
+                        <span class="ml-3">Loading candidates...</span>
+                    </div>
+                </div>
+                
+                <!-- Vote Button -->
+                <div class="mt-8">
+                    <button id="voteButton" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-4 px-6 rounded-md transition-all transform hover:scale-[1.02] disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:hover:scale-100 disabled:cursor-not-allowed flex justify-center items-center shadow-lg" disabled>
+                        <span class="icon-vote mr-2"></span>
+                        Cast Your Vote
+                    </button>
+                </div>
+                
+                <!-- Feedback Messages -->
+                <div id="feedbackContainer" class="mt-4 p-4 rounded-md hidden">
+                    <div class="flex items-start">
+                        <div id="feedbackIcon" class="flex-shrink-0 mr-3">
+                            <!-- Icon will be added by JavaScript -->
+                        </div>
+                        <div>
+                            <h3 id="feedbackTitle" class="font-medium"></h3>
+                            <p id="feedback" class="text-sm mt-1"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Section (will be shown after voting or when voting ends) -->
+        <div id="resultsSection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-8 hidden">
+            <div class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
+                <h2 class="text-lg font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                    <span class="icon-chart mr-2"></span>
+                    Live Results
+                </h2>
+            </div>
+            <div class="p-6" id="resultsContent">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 p-4 text-center text-gray-600 dark:text-gray-400 text-sm mt-8 shadow-inner">
+        <div class="max-w-7xl mx-auto">
+            <p>Decentralized Voting System &copy; 2025 - Powered by <span class="font-medium">Ethereum Blockchain</span></p>
+            <div class="flex justify-center space-x-6 mt-3">
+                <a href="#" class="text-gray-500 hover:text-primary-500 transition-colors">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-primary-500 transition-colors">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="text-gray-500 hover:text-primary-500 transition-colors">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Debug Panel -->
+    <div id="debugPanel" class="fixed inset-0 bg-black/90 z-50 p-4 overflow-auto hidden">
+        <button id="closeDebugPanel" class="absolute top-4 right-4 text-white hover:text-gray-300">
+            <span class="icon-times"></span>
+        </button>
+        <h3 class="text-xl text-white mb-4">Debug Console</h3>
+        <div id="debugContent"></div>
+    </div>
+
+    <!-- Ethers.js for blockchain interaction -->
+    <script src="https://unpkg.com/ethers@6.13.1/dist/ethers.umd.min.js"></script>
+    
+    <!-- Application JavaScript -->
+    <script src="../js/app.js"></script>
+    
+    <!-- Theme toggle script -->
+    <script>
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle("dark");
+            localStorage.theme = isDark ? "dark" : "light";
+            
+            // Update icons
+            document.getElementById("sunIcon").classList.toggle("hidden", isDark);
+            document.getElementById("moonIcon").classList.toggle("hidden", !isDark);
+            
+            // Force Tailwind to recognize the dark mode change
+            if (isDark) {
+                document.documentElement.style.colorScheme = "dark";
+            } else {
+                document.documentElement.style.colorScheme = "light";
+            }
+        }
+        
+        // Set initial theme based on localStorage or system preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = "dark";
+            document.getElementById("sunIcon").classList.add("hidden");
+            document.getElementById("moonIcon").classList.remove("hidden");
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = "light";
+            document.getElementById("sunIcon").classList.remove("hidden");
+            document.getElementById("moonIcon").classList.add("hidden");
+        }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Configuration
+            const API_URL = "http://localhost:8000";
+            const CONTRACT_ADDRESS = "0xa95f9E532a1Cd51fD03052A8E5f04528287f8fca";
+            
+            // State variables
+            let provider;
+            let signer;
+            let votingContract;
+            let selectedCandidateId = null;
+            let votingStatus = null;
+            let contractConnected = false;
+            let candidates = [];
+            
+            // Get authentication data
+            const token = localStorage.getItem("token");
+            const refreshToken = localStorage.getItem("refreshToken");
+            const voterId = localStorage.getItem("voterId");
+            
+            // Check authentication
+            if (!token || !voterId) {
+                window.location.href = "login.html";
+                return;
+            }
+            
+            // DOM Elements
+            const walletAddress = document.getElementById("walletAddress");
+            const datesDisplay = document.getElementById("datesDisplay");
+            const datesLoadingIndicator = document.getElementById("datesLoadingIndicator");
+            const candidateCards = document.getElementById("candidateCards");
+            const voteButton = document.getElementById("voteButton");
+            const logoutButton = document.getElementById("logoutButton");
+            const statusAlert = document.getElementById("statusAlert");
+            const statusIcon = document.getElementById("statusIcon");
+            const statusTitle = document.getElementById("statusTitle");
+            const statusMessage = document.getElementById("statusMessage");
+            const feedbackContainer = document.getElementById("feedbackContainer");
+            const feedbackTitle = document.getElementById("feedbackTitle");
+            const feedbackIcon = document.getElementById("feedbackIcon");
+            const feedback = document.getElementById("feedback");
+            const networkInfo = document.getElementById("networkInfo");
+            const contractInfo = document.getElementById("contractInfo");
+            const connectButton = document.getElementById("connectButton");
+            const refreshButton = document.getElementById("refreshButton");
+            const debugPanel = document.getElementById("debugPanel");
+            const debugContent = document.getElementById("debugContent");
+            const closeDebugPanel = document.getElementById("closeDebugPanel");
+            const themeToggle = document.getElementById("themeToggle");
+            const electionBadge = document.getElementById("electionBadge");
+            const electionProgressContainer = document.getElementById("electionProgressContainer");
+            const electionProgress = document.getElementById("electionProgress");
+            const electionStartLabel = document.getElementById("electionStartLabel");
+            const electionEndLabel = document.getElementById("electionEndLabel");
+            const electionTimeRemaining = document.getElementById("electionTimeRemaining");
+            const resultsSection = document.getElementById("resultsSection");
+            const resultsContent = document.getElementById("resultsContent");
+
+            // Display wallet address
+            if (voterId) {
+                walletAddress.textContent = `${voterId.substring(0, 6)}...${voterId.substring(voterId.length - 4)}`;
+                walletAddress.title = voterId;
+            }
+
+            // Debug Logger
+            function debugLog(message, data = null) {
+                if (!debugPanel || !debugContent) return;
+                
+                const timestamp = new Date().toLocaleTimeString();
+                let content = `<div class="mb-1"><span class="text-gray-400">${timestamp}</span> ${message}</div>`;
+                
+                if (data) {
+                    if (typeof data === 'object') {
+                        // Custom replacer function to handle BigInt values
+                        const replacer = (key, value) => {
+                            // Convert BigInt to String to avoid serialization errors
+                            if (typeof value === 'bigint') {
+                                return value.toString();
+                            }
+                            return value;
+                        };
+                        content += `<pre class="text-green-400 text-xs mt-1 mb-2 overflow-x-auto">${JSON.stringify(data, replacer, 2)}</pre>`;
+                    } else {
+                        content += `<pre class="text-green-400 text-xs mt-1 mb-2">${data}</pre>`;
+                    }
+                }
+                
+                debugContent.innerHTML = content + debugContent.innerHTML;
+                console.log(message, data);
+            }
+
+            // Helper function for API requests with token refresh
+            async function makeApiRequest(endpoint, method = 'GET', data = null, retryCount = 0) {
+                // Get the most current token
+                const currentToken = localStorage.getItem('token');
+                const url = `${API_URL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
+                
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    mode: 'cors',
+                    credentials: 'same-origin'
+                };
+                
+                if (data && ['POST', 'PUT', 'PATCH'].includes(method)) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                debugLog(`Making ${method} request to ${url}`);
+                
+                try {
+                    const response = await fetch(url, options);
+                    
+                    // Handle unauthorized responses by attempting token refresh
+                    if (response.status === 401) {
+                        debugLog("Received 401 Unauthorized, attempting token refresh");
+                        
+                        // Maximum retry to prevent infinite loops
+                        if (retryCount >= 2) {
+                            debugLog("Maximum retries reached for token refresh");
+                            await logout(true);
+                            throw new Error("Session expired. Please login again.");
+                        }
+                        
+                        const refreshSuccess = await refreshTokenFn();
+                        if (refreshSuccess) {
+                            debugLog("Token refreshed successfully, retrying original request");
+                            return makeApiRequest(endpoint, method, data, retryCount + 1);
+                        } else {
+                            debugLog("Token refresh failed");
+                            await logout(true);
+                            throw new Error("Authentication failed. Please login again.");
+                        }
+                    }
+                    
+                    // Handle response data
+                    let result;
+                    const contentType = response.headers.get('content-type');
+                    
+                    if (contentType && contentType.includes('application/json')) {
+                        result = await response.json();
+                    } else {
+                        const text = await response.text();
+                        debugLog("Received non-JSON response", text.substring(0, 100) + (text.length > 100 ? '...' : ''));
+                        
+                        try {
+                            result = JSON.parse(text);
+                        } catch (e) {
+                            if (text.includes('<!DOCTYPE html>')) {
+                                throw new Error("Received HTML instead of JSON. API server may be misconfigured.");
+                            }
+                            result = { message: text };
+                        }
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(result.detail || result.message || `Request failed with status ${response.status}`);
+                    }
+                    
+                    return result;
+                } catch (error) {
+                    debugLog("API request failed:", error);
+                    throw error;
+                }
+            }
+            
+            // Token refresh function
+            async function refreshTokenFn() {
+                const refreshTokenValue = localStorage.getItem("refreshToken");
+                if (!refreshTokenValue) {
+                    debugLog("No refresh token available");
+                    return false;
+                }
+                
+                debugLog("Attempting to refresh access token");
+                
+                try {
+                    const response = await fetch(`${API_URL}/refresh`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ refresh_token: refreshTokenValue }),
+                        mode: 'cors',
+                        credentials: 'same-origin'
+                    });
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        debugLog(`Token refresh failed with status ${response.status}:`, errorText);
+                        return false;
+                    }
+                    
+                    let data;
+                    try {
+                        data = await response.json();
+                    } catch (e) {
+                        debugLog("Failed to parse refresh token response:", e);
+                        return false;
+                    }
+                    
+                    if (!data.token) {
+                        debugLog("Refresh response did not contain a new token");
+                        return false;
+                    }
+                    
+                    debugLog("Token refreshed successfully");
+                    
+                    // Store the new tokens
+                    localStorage.setItem('token', data.token);
+                    
+                    // If a new refresh token is provided, update it as well
+                    if (data.refresh_token) {
+                        localStorage.setItem('refreshToken', data.refresh_token);
+                    }
+                    
+                    return true;
+                } catch (error) {
+                    debugLog("Token refresh request failed:", error);
+                    return false;
+                }
+            }
+
+            // Enhanced logout function
+            async function logout(skipApiCall = false) {
+                debugLog("Logging out user");
+                
+                // Get tokens before we clear them, for the API call
+                const currentToken = localStorage.getItem("token");
+                
+                // First clear local storage to prevent any further authenticated requests
+                localStorage.removeItem("token");
+                localStorage.removeItem("refreshToken");
+                localStorage.removeItem("voterId");
+                localStorage.removeItem("role");
+                sessionStorage.clear();
+                
+                // Clear any authentication cookies
+                document.cookie.split(";").forEach(cookie => {
+                    const [name] = cookie.trim().split("=");
+                    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+                });
+                
+                // Only make the API logout call if we have a token and skipApiCall is false
+                if (currentToken && !skipApiCall) {
+                    try {
+                        await fetch(`${API_URL}/logout`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${currentToken}`
+                            },
+                            mode: 'cors',
+                            credentials: 'same-origin'
+                        });
+                        debugLog("API logout successful");
+                    } catch (error) {
+                        debugLog("API logout error:", error);
+                    }
+                }
+                
+                // Redirect to login page
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 100);
+            }
+
+            // Helper functions
+            function showFeedback(message, title = "", isError = false) {
+                feedbackContainer.classList.remove("hidden", "bg-green-50", "bg-red-50", "dark:bg-green-900/20", "dark:bg-red-900/20", "border-green-200", "border-red-200", "dark:border-green-900", "dark:border-red-900");
+                
+                if (isError) {
+                    feedbackContainer.classList.add("bg-red-50", "dark:bg-red-900/20", "border", "border-red-200", "dark:border-red-900");
+                    feedbackIcon.innerHTML = '<span class="icon-exclamation-circle text-red-500 mt-0.5"></span>';
+                    feedbackTitle.textContent = title || "Error";
+                    feedbackTitle.className = "font-medium text-red-800 dark:text-red-300";
+                    feedback.className = "text-sm text-red-700 dark:text-red-200";
+                } else {
+                    feedbackContainer.classList.add("bg-green-50", "dark:bg-green-900/20", "border", "border-green-200", "dark:border-green-900");
+                    feedbackIcon.innerHTML = '<span class="icon-check-circle text-green-500 mt-0.5"></span>';
+                    feedbackTitle.textContent = title || "Success";
+                    feedbackTitle.className = "font-medium text-green-800 dark:text-green-300";
+                    feedback.className = "text-sm text-green-700 dark:text-green-200";
+                }
+                
+                feedback.textContent = message;
+                feedbackContainer.classList.add("fade-in");
+                
+                // Auto-hide success messages after 5 seconds
+                if (!isError) {
+                    setTimeout(() => {
+                        feedbackContainer.classList.add("hidden");
+                    }, 5000);
+                }
+                
+                debugLog(isError ? `Error: ${message}` : `Success: ${message}`);
+            }
+
+            function setLoading(button, isLoading, text = "Cast Your Vote", loadingText = "Processing...") {
+                if (isLoading) {
+                    button._originalText = button.innerHTML;
+                    button.disabled = true;
+                    button.innerHTML = `<span class="loader"></span><span>${loadingText}</span>`;
+                } else {
+                    button.disabled = selectedCandidateId === null || votingStatus !== "active";
+                    button.innerHTML = button._originalText || `<span class="icon-vote mr-2"></span>${text}`;
+                }
+            }
+            
+            // Update election status alert
+            function updateStatusAlert(status) {
+                votingStatus = status;
+                statusAlert.classList.remove("hidden");
+                
+                // Reset all classes
+                statusAlert.className = "p-4 border-b fade-in";
+                
+                switch(status) {
+                    case "not_started":
+                        statusAlert.classList.add("bg-yellow-50", "dark:bg-yellow-900/20", "border-yellow-200", "dark:border-yellow-900");
+                        statusIcon.innerHTML = '<span class="icon-clock text-yellow-500"></span>';
+                        statusTitle.textContent = "Election Not Started";
+                        statusTitle.className = "text-sm font-medium text-yellow-800 dark:text-yellow-300";
+                        statusMessage.textContent = "This election has not started yet. Please check back during the scheduled voting period.";
+                        statusMessage.className = "text-sm text-yellow-700 dark:text-yellow-200";
+                        
+                        electionBadge.textContent = "Not Started";
+                        electionBadge.className = "px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+                        electionBadge.classList.remove("hidden");
+                        
+                        voteButton.disabled = true;
+                        break;
+                        
+                    case "active":
+                        statusAlert.classList.add("bg-green-50", "dark:bg-green-900/20", "border-green-200", "dark:border-green-900");
+                        statusIcon.innerHTML = '<span class="icon-vote text-green-500"></span>';
+                        statusTitle.textContent = "Voting Open";
+                        statusTitle.className = "text-sm font-medium text-green-800 dark:text-green-300";
+                        statusMessage.textContent = "Voting is currently active. Select a candidate and cast your vote securely on the blockchain.";
+                        statusMessage.className = "text-sm text-green-700 dark:text-green-200";
+                        
+                        electionBadge.textContent = "Active";
+                        electionBadge.className = "px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+                        electionBadge.classList.remove("hidden");
+                        
+                        voteButton.disabled = selectedCandidateId === null;
+                        break;
+                        
+                    case "ended":
+                        statusAlert.classList.add("bg-gray-50", "dark:bg-gray-800", "border-gray-200", "dark:border-gray-700");
+                        statusIcon.innerHTML = '<span class="icon-flag-checkered text-gray-500"></span>';
+                        statusTitle.textContent = "Election Completed";
+                        statusTitle.className = "text-sm font-medium text-gray-800 dark:text-gray-300";
+                        statusMessage.textContent = "This election has concluded. Results are displayed below and permanently recorded on the blockchain.";
+                        statusMessage.className = "text-sm text-gray-700 dark:text-gray-400";
+                        
+                        electionBadge.textContent = "Completed";
+                        electionBadge.className = "px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+                        electionBadge.classList.remove("hidden");
+                        
+                        voteButton.disabled = true;
+                        
+                        // Show results section
+                        showResults();
+                        break;
+                        
+                    default:
+                        statusAlert.classList.add("hidden");
+                        electionBadge.classList.add("hidden");
+                        break;
+                }
+            }
+            
+            // Show election results
+            function showResults() {
+                if (!candidates || candidates.length === 0) return;
+                
+                // Sort candidates by vote count
+                const sortedCandidates = [...candidates].sort((a, b) => {
+                    const voteA = parseInt(a.voteCount?.toString() || a.voteCount || 0);
+                    const voteB = parseInt(b.voteCount?.toString() || b.voteCount || 0);
+                    return voteB - voteA;
+                });
+                
+                // Calculate total votes
+                const totalVotes = sortedCandidates.reduce((sum, candidate) => {
+                    return sum + parseInt(candidate.voteCount?.toString() || candidate.voteCount || 0);
+                }, 0);
+                
+                // Create results HTML
+                let resultsHTML = '';
+                
+                // Add total votes info
+                resultsHTML += `
+                    <div class="mb-6 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-md">
+                        <div class="font-medium text-lg mb-1 text-primary-800 dark:text-primary-300">Total Votes Cast: ${totalVotes}</div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">All votes are securely recorded on the Ethereum blockchain</p>
+                    </div>
+                `;
+                
+                // Add results table
+                resultsHTML += `
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="text-xs uppercase font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700">
+                                <tr>
+                                    <th class="p-3">Rank</th>
+                                    <th class="p-3">Candidate</th>
+                                    <th class="p-3">Party</th>
+                                    <th class="p-3 text-right">Votes</th>
+                                    <th class="p-3 text-right">Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                // Add candidate rows
+                sortedCandidates.forEach((candidate, index) => {
+                    const voteCount = parseInt(candidate.voteCount?.toString() || candidate.voteCount || 0);
+                    const percentage = totalVotes > 0 ? ((voteCount / totalVotes) * 100).toFixed(1) : '0.0';
+                    const isWinner = index === 0 && totalVotes > 0;
+                    
+                    resultsHTML += `
+                        <tr class="border-b border-gray-200 dark:border-gray-700 ${isWinner ? 'bg-green-50 dark:bg-green-900/10' : ''}">
+                            <td class="p-3 font-medium">${index + 1}</td>
+                            <td class="p-3 flex items-center">
+                                ${candidate.name}
+                                ${isWinner ? '<span class="ml-2 text-green-600 dark:text-green-400"><span class="icon-trophy"></span></span>' : ''}
+                            </td>
+                            <td class="p-3">${candidate.party}</td>
+                            <td class="p-3 text-right font-medium">${voteCount}</td>
+                            <td class="p-3 text-right">
+                                <div class="flex items-center justify-end">
+                                    <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mr-2">
+                                        <div class="h-2.5 rounded-full ${isWinner ? 'bg-green-500' : 'bg-primary-500'}" style="width: ${percentage}%"></div>
+                                    </div>
+                                    ${percentage}%
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                resultsHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                // Update the results section
+                resultsContent.innerHTML = resultsHTML;
+                resultsSection.classList.remove("hidden");
+            }
+            
+            // Safe contract call with error handling
+            async function safeContractCall(contractFn, fallbackValue = null, errorMessage = "Contract operation failed") {
+                try {
+                    debugLog("Attempting contract call...");
+                    const result = await contractFn();
+                    
+                    // Process the result to handle BigInt values
+                    const processedResult = processBigIntValues(result);
+                    debugLog("Contract call successful", processedResult);
+                    return result;
+                } catch (error) {
+                    debugLog(`${errorMessage}:`, error);
+                    
+                    // Check for specific error types for better user messages
+                    if (error.message.includes("AlreadyVoted")) {
+                        throw new Error("You have already voted");
+                    } else if (error.message.includes("VotingNotActive")) {
+                        throw new Error("Voting is not currently active");
+                    } else if (error.message.includes("InvalidCandidate")) {
+                        throw new Error("Invalid candidate selection");
+                    } else if (error.message.includes("user denied")) {
+                        throw new Error("Transaction rejected. Please confirm in MetaMask.");
+                    } else if (error.message.includes("missing revert data") || error.code === "CALL_EXCEPTION") {
+                        // Handle missing revert data errors (common with some contract interactions)
+                        if (error.transaction && error.transaction.data) {
+                            // Check if this is a vote transaction
+                            if (error.transaction.data.startsWith("0x0121b93f")) {
+                                // Check if voting is active by getting the voting period
+                                try {
+                                    const now = Math.floor(Date.now() / 1000);
+                                    const votingPeriod = await votingContract.getVotingPeriod();
+                                    const startTime = parseInt(votingPeriod[0].toString());
+                                    const endTime = parseInt(votingPeriod[1].toString());
+                                    
+                                    debugLog("Current time vs voting period:", { now, startTime, endTime });
+                                    
+                                    if (now < startTime) {
+                                        throw new Error("Voting has not started yet. Please wait until the voting period begins.");
+                                    } else if (now > endTime) {
+                                        throw new Error("Voting period has ended. You can no longer cast votes.");
+                                    } else {
+                                        // Check if user has already voted
+                                        const hasVoted = await votingContract.hasVoted(signer.address);
+                                        if (hasVoted) {
+                                            throw new Error("You have already cast your vote in this election.");
+                                        } else {
+                                            // If we can't determine the specific reason but voting should be active and user hasn't voted
+                                            throw new Error("Vote failed: The transaction was rejected by the blockchain. This could be due to network congestion or contract restrictions.");
+                                        }
+                                    }
+                                } catch (periodError) {
+                                    debugLog("Error checking voting period during error handling:", periodError);
+                                    // If we can't determine the specific reason, use a generic message
+                                    throw new Error("Vote failed: You may have already voted or voting is not active");
+                                }
+                            } else {
+                                throw new Error("Transaction failed: The contract rejected the operation");
+                            }
+                        } else {
+                            throw new Error("Transaction failed: The contract rejected the operation");
+                        }
+                    }
+                    
+                    if (fallbackValue !== null) {
+                        debugLog("Returning fallback value", fallbackValue);
+                        return fallbackValue;
+                    }
+                    throw new Error(errorMessage + ": " + error.message);
+                }
+            }
+            
+            // Helper function to process BigInt values in contract results
+            function processBigIntValues(data) {
+                if (data === null || data === undefined) {
+                    return data;
+                }
+                
+                // Handle arrays (including array-like objects returned by ethers.js)
+                if (Array.isArray(data) || (typeof data === 'object' && data.length !== undefined)) {
+                    return Array.from(data).map(item => processBigIntValues(item));
+                }
+                
+                // Handle BigInt
+                if (typeof data === 'bigint') {
+                    return data.toString();
+                }
+                
+                // Handle objects
+                if (typeof data === 'object' && data !== null) {
+                    const result = {};
+                    for (const key in data) {
+                        if (Object.prototype.hasOwnProperty.call(data, key) && isNaN(parseInt(key))) {
+                            result[key] = processBigIntValues(data[key]);
+                        }
+                    }
+                    return result;
+                }
+                
+                return data;
+            }
+            
+            // Update the election progress bar
+            function updateElectionProgressBar(startDate, endDate) {
+                const now = new Date();
+                const start = new Date(startDate * 1000);
+                const end = new Date(endDate * 1000);
+                
+                // Format dates for display
+                electionStartLabel.textContent = start.toLocaleDateString();
+                electionEndLabel.textContent = end.toLocaleDateString();
+                
+                // Show progress container
+                electionProgressContainer.classList.remove("hidden");
+                
+                // Calculate progress percentage
+                if (now < start) {
+                    // Election hasn't started
+                    electionProgress.style.width = "0%";
+                    electionProgress.className = "h-full rounded-full bg-yellow-500";
+                    
+                    // Calculate time until election starts
+                    const timeUntilStart = start - now;
+                    const daysUntilStart = Math.floor(timeUntilStart / (1000 * 60 * 60 * 24));
+                    
+                    if (daysUntilStart > 0) {
+                        electionTimeRemaining.textContent = `Election starts in ${daysUntilStart} day${daysUntilStart !== 1 ? 's' : ''}`;
+                    } else {
+                        const hoursUntilStart = Math.floor(timeUntilStart / (1000 * 60 * 60));
+                        electionTimeRemaining.textContent = `Election starts in ${hoursUntilStart} hour${hoursUntilStart !== 1 ? 's' : ''}`;
+                    }
+                } else if (now > end) {
+                    // Election has ended
+                    electionProgress.style.width = "100%";
+                    electionProgress.className = "h-full rounded-full bg-gray-500";
+                    electionTimeRemaining.textContent = "Election has ended";
+                } else {
+                    // Election is active
+                    const totalDuration = end - start;
+                    const elapsed = now - start;
+                    const progressPercentage = (elapsed / totalDuration) * 100;
+                    
+                    electionProgress.style.width = `${progressPercentage}%`;
+                    electionProgress.className = "h-full rounded-full bg-primary-500";
+                    
+                    // Calculate time remaining
+                    const timeRemaining = end - now;
+                    const daysRemaining = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                    
+                    if (daysRemaining > 0) {
+                        electionTimeRemaining.textContent = `${daysRemaining} day${daysRemaining !== 1 ? 's' : ''} remaining to vote`;
+                    } else {
+                        const hoursRemaining = Math.floor(timeRemaining / (1000 * 60 * 60));
+                        electionTimeRemaining.textContent = `${hoursRemaining} hour${hoursRemaining !== 1 ? 's' : ''} remaining to vote`;
+                    }
+                }
+            }
+            
+            // Display voting dates and update status
+            function displayVotingDates(data) {
+                // Create Date objects from timestamps
+                const startDate = new Date(data.start_date * 1000);
+                const endDate = new Date(data.end_date * 1000);
+
+                // Format dates with better readability
+                const formatOptions = { 
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                
+                const startFormatted = startDate.toLocaleDateString(undefined, formatOptions);
+                const endFormatted = endDate.toLocaleDateString(undefined, formatOptions);
+                
+                // Update display
+                datesDisplay.innerHTML = `
+                    <span class="font-medium">Start:</span> ${startFormatted}
+                    <span class="mx-2">•</span>
+                    <span class="font-medium">End:</span> ${endFormatted}
+                `;
+                
+                datesLoadingIndicator.classList.add("hidden");
+                
+                // Update election progress bar
+                updateElectionProgressBar(data.start_date, data.end_date);
+                
+                // Check voting status based on current time and update UI
+                const now = new Date();
+                const currentTimestamp = Math.floor(now.getTime() / 1000);
+                
+                // Validate date inputs
+                if (!startDate || !endDate) {
+                    debugLog('Invalid voting period dates');
+                    updateStatusAlert("error");
+                    return;
+                }
+                
+                try {
+                    const startTimestamp = Math.floor(startDate.getTime() / 1000);
+                    const endTimestamp = Math.floor(endDate.getTime() / 1000);
+                    
+                    if (currentTimestamp < startTimestamp) {
+                        updateStatusAlert("not_started");
+                        debugLog(`Voting not started. Starts in: ${formatTimeRemaining(startTimestamp - currentTimestamp)}`);
+                    } else if (currentTimestamp > endTimestamp) {
+                        updateStatusAlert("ended");
+                        debugLog('Voting period has ended');
+                    } else {
+                        updateStatusAlert("active");
+                        debugLog(`Voting is active. Ends in: ${formatTimeRemaining(endTimestamp - currentTimestamp)}`);
+                    }
+                } catch (error) {
+                    console.error('Error updating voting status:', error);
+                    debugLog('Failed to update voting status');
+                    updateStatusAlert("error");
+                }
+            }
+
+            // Helper function to format time remaining
+            function formatTimeRemaining(secondsRemaining) {
+                const days = Math.floor(secondsRemaining / 86400);
+                const hours = Math.floor((secondsRemaining % 86400) / 3600);
+                const minutes = Math.floor((secondsRemaining % 3600) / 60);
+                
+                if (days > 0) return `${days}d ${hours}h`;
+                if (hours > 0) return `${hours}h ${minutes}m`;
+                return `${minutes}m`;
+            }
+            
+            // Display candidates and update UI
+            function displayCandidates(candidateData, hasVoted) {
+                candidateCards.innerHTML = "";
+                // Store candidates globally
+                candidates = candidateData;
+                
+                if (candidates.length === 0) {
+                    candidateCards.innerHTML = `
+                        <div class="col-span-full p-12 text-center bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <span class="icon-users-slash text-4xl text-gray-400 dark:text-gray-500 mb-4"></span>
+                            <p class="text-gray-500 dark:text-gray-400">No candidates available for this election</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                candidates.forEach(candidate => {
+                    // Handle both mock data and contract data structure
+                    const id = candidate.id?.toString() || candidate.id;
+                    const name = candidate.name;
+                    const party = candidate.party;
+                    const voteCount = parseInt(candidate.voteCount?.toString() || candidate.voteCount || 0);
+                    
+                    // Create a default image URL using data URI instead of external service
+                    const imageUrl = candidate.imageUrl || 
+                        `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" fill="%23f0f0f0"/><text x="50%" y="50%" font-family="Arial" font-size="24" text-anchor="middle" dominant-baseline="middle" fill="%23333">${name}</text></svg>`;
+                    
+                    // Create candidate card
+                    const candidateCard = document.createElement("div");
+                    candidateCard.className = "candidate-card bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700";
+                    candidateCard.setAttribute("data-id", id);
+                    candidateCard.id = `candidate-card-${id}`;
+                    
+                    candidateCard.innerHTML = `
+                        <div class="relative pb-48 overflow-hidden">
+                            <img class="absolute inset-0 h-full w-full object-cover" src="${imageUrl}" alt="${name}">
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">${name}</h3>
+                                    <p class="text-primary-600 dark:text-primary-400">${party}</p>
+                                </div>
+                                <div class="ml-2">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-300">
+                                        ${voteCount} vote${voteCount !== 1 ? 's' : ''}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <div class="flex items-center justify-center">
+                                    <input type="radio" id="candidate-${id}" name="candidate" value="${id}" class="sr-only" ${hasVoted ? 'disabled' : ''}>
+                                    <label for="candidate-${id}" class="w-full py-2 px-4 border-2 border-gray-300 dark:border-gray-600 rounded-lg text-center cursor-pointer font-medium text-gray-700 dark:text-gray-300 hover:border-primary-500 dark:hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors">
+                                        Select Candidate
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    candidateCards.appendChild(candidateCard);
+                    
+                    // Add click handler to the entire card
+                    candidateCard.addEventListener("click", () => {
+                        if (hasVoted || votingStatus !== "active") return;
+                        
+                        // Find the radio input and check it
+                        const radio = candidateCard.querySelector(`input[type="radio"]`);
+                        radio.checked = true;
+                        
+                        // Update selected candidate
+                        selectedCandidateId = id;
+                        
+                        // Remove selection styling from all cards
+                        document.querySelectorAll('.candidate-card').forEach(card => {
+                            card.classList.remove('selected-candidate');
+                        });
+                        
+                        // Add selection styling to this card
+                        candidateCard.classList.add('selected-candidate');
+                        
+                        // Enable vote button
+                        voteButton.disabled = false;
+                    });
+                });
+
+                // Disable vote button if already voted
+                if (hasVoted) {
+                    voteButton.disabled = true;
+                    voteButton.innerHTML = '<span class="icon-check-circle mr-2"></span>You have already voted';
+                    showFeedback("Your vote has been recorded on the blockchain", "Vote Confirmed", false);
+                    
+                    // Show results when user has voted
+                    showResults();
+                }
+            }
+            
+            // Cast vote function
+            async function castVote(event) {
+                try {
+                    const selectedCandidateId = document.querySelector('input[name="candidate"]:checked')?.value;
+                    
+                    if (!selectedCandidateId) {
+                        showFeedback("Please select a candidate", "Selection Required", true);
+                        return;
+                    }
+                    
+                    debugLog("Attempting to vote for candidate ID:", selectedCandidateId);
+                    
+                    // Check if contract is connected
+                    if (!contractConnected || !votingContract) {
+                        showFeedback("Blockchain connection not established. Please refresh the page and try again.", "Connection Error", true);
+                        return;
+                    }
+                    
+                    // Check if voting is active
+                    try {
+                        const now = Math.floor(Date.now() / 1000);
+                        debugLog("Current timestamp:", now);
+                        
+                        const votingPeriod = await safeContractCall(
+                            () => votingContract.getVotingPeriod(),
+                            null,
+                            "Failed to get voting period"
+                        );
+                        
+                        const startTime = parseInt(votingPeriod[0].toString());
+                        const endTime = parseInt(votingPeriod[1].toString());
+                        
+                        debugLog("Voting period:", { startTime, endTime });
+                        
+                        if (now < startTime) {
+                            showFeedback("Voting has not started yet. Please wait until the voting period begins.", "Voting Not Active", true);
+                            return;
+                        } else if (now > endTime) {
+                            showFeedback("Voting period has ended. You can no longer cast votes.", "Voting Ended", true);
+                            return;
+                        }
+                    } catch (periodError) {
+                        debugLog("Error checking voting period:", periodError);
+                        // Continue with the vote attempt, the contract will reject if not active
+                    }
+                    
+                    // Check if already voted
+                    const hasVoted = await safeContractCall(
+                        () => votingContract.hasVoted(signer.address),
+                        false,
+                        "Failed to check voting status"
+                    );
+                    
+                    if (hasVoted) {
+                        showFeedback("You have already cast a vote in this election", "Already Voted", true);
+                        voteButton.disabled = true;
+                        voteButton.innerHTML = '<span class="icon-check-circle mr-2"></span>Already Voted';
+                        return;
+                    }
+                    
+                    // Get selected candidate info
+                    const selectedCandidate = candidates.find(c => c.id.toString() === selectedCandidateId.toString());
+                    
+                    // Add processing state to card
+                    const candidateCard = document.querySelector(`#candidate-card-${selectedCandidateId}`);
+                    if (candidateCard) {
+                        candidateCard.classList.add("ring-4", "ring-primary-300", "dark:ring-primary-700", "ring-opacity-50");
+                    }
+                    
+                    // Cast vote on blockchain
+                    showFeedback("Connecting to Ethereum network...", "Transaction Initiated", false);
+                    
+                    try {
+                        debugLog("Preparing to send vote transaction for candidate ID:", selectedCandidateId);
+                        
+                        // Check if the candidate exists
+                        const candidateExists = candidates.some(c => c.id.toString() === selectedCandidateId.toString());
+                        if (!candidateExists) {
+                            throw new Error(`Candidate with ID ${selectedCandidateId} does not exist`);
+                        }
+                        
+                        // Ensure the candidate ID is a number
+                        const candidateIdNumber = parseInt(selectedCandidateId);
+                        debugLog("Converted candidate ID to number:", candidateIdNumber);
+                        
+                        const tx = await safeContractCall(
+                            () => votingContract.vote(candidateIdNumber),
+                            null,
+                            "Failed to cast vote"
+                        );
+                        
+                        if (!tx) {
+                            throw new Error("Transaction failed");
+                        }
+                        
+                        debugLog("Vote transaction sent", { hash: tx.hash, candidate: selectedCandidate?.name });
+                        
+                        // Show pending status
+                        showFeedback(
+                            `Your vote for ${selectedCandidate?.name} is being recorded on the blockchain. This may take a moment...`, 
+                            "Transaction Pending", 
+                            false
+                        );
+                        
+                        // Wait for transaction confirmation
+                        const receipt = await tx.wait();
+                        debugLog("Vote transaction confirmed", receipt);
+                        
+                        // Update UI
+                        showFeedback(
+                            `Your vote for ${selectedCandidate?.name} has been recorded on the blockchain!`, 
+                            "Vote Confirmed", 
+                            false
+                        );
+                        
+                        // Disable voting button
+                        voteButton.disabled = true;
+                        voteButton.innerHTML = '<span class="icon-check-circle mr-2"></span>Vote Recorded';
+                        
+                        // Refresh candidates after voting
+                        await loadCandidates();
+                    } catch (error) {
+                        debugLog("Voting error", error);
+                        
+                        // Remove processing state from card
+                        if (candidateCard) {
+                            candidateCard.classList.remove("ring-4", "ring-primary-300", "dark:ring-primary-700", "ring-opacity-50");
+                        }
+                        
+                        // Handle specific error for missing revert data
+                        if (error.message.includes("missing revert data") && error.code === "CALL_EXCEPTION") {
+                            debugLog("Detected missing revert data error, checking voting conditions");
+                            
+                            // Check if voting is active
+                            const now = Math.floor(Date.now() / 1000);
+                            try {
+                                const votingPeriod = await votingContract.getVotingPeriod();
+                                const startTime = parseInt(votingPeriod[0].toString());
+                                const endTime = parseInt(votingPeriod[1].toString());
+                                
+                                if (now < startTime) {
+                                    showFeedback("Voting has not started yet. Please wait until the voting period begins.", "Voting Not Active", true);
+                                    return;
+                                } else if (now > endTime) {
+                                    showFeedback("Voting period has ended. You can no longer cast votes.", "Voting Ended", true);
+                                    return;
+                                }
+                            } catch (periodError) {
+                                debugLog("Error checking voting period after vote failure:", periodError);
+                            }
+                            
+                            showFeedback("Your vote could not be processed. This may be due to network issues or you may have already voted.", "Vote Failed", true);
+                            return;
+                        }
+                        
+                        // Check if user already voted (contract might have rejected for this reason)
+                        const checkVoteStatus = await safeContractCall(
+                            () => votingContract.hasVoted(signer.address),
+                            false,
+                            "Failed to check voting status"
+                        );
+                        
+                        if (checkVoteStatus) {
+                            showFeedback("You have already cast a vote in this election", "Already Voted", true);
+                            voteButton.disabled = true;
+                            voteButton.innerHTML = '<span class="icon-check-circle mr-2"></span>Already Voted';
+                        } else {
+                            // Show generic error
+                            showFeedback(
+                                `Vote failed: ${error.message}`, 
+                                "Transaction Failed", 
+                                true
+                            );
+                        }
+                    }
+                } catch (error) {
+                    debugLog("Voting error", error);
+                    showFeedback(`Error: ${error.message}`, "Error", true);
+                }
+            }
+            
+            // Initialize Ethers.js & MetaMask connection
+            async function initWeb3() {
+                debugLog("Initializing Web3...");
+                
+                if (!window.ethereum) {
+                    debugLog("MetaMask not installed");
+                    showFeedback("MetaMask is required to connect to the blockchain. Please install it.", "MetaMask Required", true);
+                    networkInfo.innerHTML = `
+                        <span class="font-medium">Network:</span> 
+                        <span class="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-2 py-0.5 rounded text-xs">
+                            Error: MetaMask not installed
+                        </span>
+                    `;
+                    return false;
+                }
+
+                try {
+                    // Initialize provider and request MetaMask accounts
+                    debugLog("Connecting to MetaMask...");
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    await window.ethereum.request({ method: "eth_requestAccounts" });
+                    signer = await provider.getSigner();
+                    debugLog("Connected to signer:", await signer.getAddress());
+
+                    // Get blockchain network details
+                    const network = await provider.getNetwork();
+                    debugLog("Connected to network", { name: network.name, chainId: network.chainId.toString() });
+
+                    // Update UI with network info
+                    networkInfo.innerHTML = `
+                        <span class="font-medium">Network:</span> 
+                        <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded text-xs">
+                            ${network.name} (Chain ID: ${network.chainId})
+                        </span>
+                    `;
+
+                    // Initialize contract
+                    debugLog("Initializing contract...");
+                    return await initContract();
+                } catch (error) {
+                    debugLog("MetaMask connection error", error);
+                    showFeedback("Failed to connect to MetaMask: " + error.message, "Connection Error", true);
+                    networkInfo.innerHTML = `
+                        <span class="font-medium">Network:</span> 
+                        <span class="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-2 py-0.5 rounded text-xs">
+                            Error: ${error.message.substring(0, 50)}${error.message.length > 50 ? '...' : ''}
+                        </span>
+                    `;
+                    return false;
+                }
+            }
+
+            // Load Voting contract
+            async function initContract() {
+                try {
+                    debugLog(`Loading contract ABI from /build/contracts/Voting.json`);
+                    const response = await fetch("/build/contracts/Voting.json");
+                    if (!response.ok) {
+                        throw new Error(`Failed to load contract ABI: ${response.statusText}`);
+                    }
+                    
+                    const artifact = await response.json();
+                    debugLog("Contract ABI loaded successfully");
+                    
+                    // Create contract instance
+                    votingContract = new ethers.Contract(CONTRACT_ADDRESS, artifact.abi, signer);
+                    
+                    // Verify contract functions
+                    const functionsValid = await checkContractFunctions();
+                    if (!functionsValid) {
+                        throw new Error("Contract missing required functions");
+                    }
+                    
+                    contractInfo.innerHTML = `
+                        <span class="font-medium">Contract:</span> 
+                        <span class="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-0.5 rounded text-xs">
+                            <a href="https://etherscan.io/address/${CONTRACT_ADDRESS}" target="_blank" class="hover:underline">
+                                ${CONTRACT_ADDRESS.substring(0, 6)}...${CONTRACT_ADDRESS.substring(CONTRACT_ADDRESS.length - 4)}
+                                <span class="icon-external-link-alt ml-1 text-xs"></span>
+                            </a>
+                        </span>
+                    `;
+                    
+                    // Set contract as connected
+                    contractConnected = true;
+                    
+                    debugLog("Contract initialized and verified successfully");
+                    return votingContract;
+                } catch (error) {
+                    debugLog("Contract initialization error", error);
+                    contractConnected = false;
+                    contractInfo.innerHTML = `
+                        <span class="font-medium">Contract:</span> 
+                        <span class="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-2 py-0.5 rounded text-xs">
+                            Error: ${error.message.substring(0, 50)}${error.message.length > 50 ? '...' : ''}
+                        </span>
+                    `;
+                    throw new Error("Failed to initialize voting contract: " + error.message);
+                }
+            }
+
+            // Add contract function verification
+            async function checkContractFunctions() {
+                if (!votingContract) {
+                    debugLog("Contract not initialized yet");
+                    return false;
+                }
+                
+                try {
+                    // Check if contract has required functions
+                    const hasGetCandidates = typeof votingContract.getAllCandidates === 'function';
+                    const hasVoteFunction = typeof votingContract.vote === 'function';
+                    const hasVotingPeriod = typeof votingContract.getVotingPeriod === 'function';
+                    const hasHasVoted = typeof votingContract.hasVoted === 'function';
+                    
+                    const functionStatus = {
+                        getAllCandidates: hasGetCandidates,
+                        vote: hasVoteFunction,
+                        getVotingPeriod: hasVotingPeriod,
+                        hasVoted: hasHasVoted
+                    };
+                    
+                    debugLog("Contract function verification:", functionStatus);
+                    
+                    // Check if all required functions are present
+                    const hasAllFunctions = Object.values(functionStatus).every(Boolean);
+                    
+                    if (!hasAllFunctions) {
+                        const missingFunctions = Object.entries(functionStatus)
+                            .filter(([_, exists]) => !exists)
+                            .map(([name]) => name);
+                            
+                        debugLog("Missing contract functions:", missingFunctions);
+                    }
+                    
+                    return hasAllFunctions;
+                } catch (error) {
+                    debugLog("Error verifying contract functions:", error);
+                    return false;
+                }
+            }
+            
+            // Load voting dates from API or contract
+            async function loadVotingDates() {
+                try {
+                    // First try the direct API
+                    const dates = await makeApiRequest('http://localhost:8000/voting/dates');
+                    debugLog('Voting dates from API:', dates);
+                    displayVotingDates(dates);
+                } catch (apiError) {
+                    debugLog('API request failed:', apiError);
+                    
+                    // Try the contract if API fails
+                    try {
+                        const votingPeriod = await votingContract.getVotingPeriod();
+                        const dates = {
+                            start_date: parseInt(votingPeriod[0].toString()),
+                            end_date: parseInt(votingPeriod[1].toString())
+                        };
+                        debugLog('Voting dates from contract:', dates);
+                        displayVotingDates(dates);
+                    } catch (contractError) {
+                        debugLog('Contract call failed:', contractError);
+                        
+                        // Use mock dates if both API and contract fail
+                        const mockDates = {
+                            start_date: Math.floor(Date.now() / 1000) - 3600, // 1 hour ago
+                            end_date: Math.floor(Date.now() / 1000) + 3600   // 1 hour from now
+                        };
+                        debugLog('Using mock voting dates:', mockDates);
+                        displayVotingDates(mockDates);
+                    }
+                }
+            }
+            
+            async function loadCandidates() {
+                debugLog("Loading candidates...");
+                try {
+                    debugLog("Contract connected status:", contractConnected);
+                    
+                    if (!contractConnected) {
+                        throw new Error("Blockchain not connected. Please connect to view candidates.");
+                    }
+                    
+                    const candidatesData = await safeContractCall(
+                        () => votingContract.getAllCandidates(), 
+                        null, 
+                        "Failed to load candidates from contract"
+                    );
+                    
+                    debugLog("Candidates data from contract:", candidatesData);
+
+                    if (!candidatesData || candidatesData.length === 0) {
+                        candidateCards.innerHTML = `
+                            <div class="col-span-full p-12 text-center bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <span class="icon-users-slash text-4xl text-gray-400 dark:text-gray-500 mb-4"></span>
+                                <p class="text-gray-500 dark:text-gray-400">No candidates available for this election</p>
+                            </div>
+                        `;
+                    } else {
+                        debugLog("Using real candidates from blockchain");
+                        displayCandidates(candidatesData, false);
+                    }
+                } catch (error) {
+                    debugLog("Error loading candidates:", error);
+                    candidateCards.innerHTML = `
+                        <div class="col-span-full p-12 text-center bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-900">
+                            <span class="icon-exclamation-triangle text-4xl text-red-400 dark:text-red-500 mb-4"></span>
+                            <p class="text-red-500 dark:text-red-400">${error.message}</p>
+                            <button id="retryLoadCandidates" class="mt-4 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-md">
+                                <span class="icon-sync-alt mr-2"></span>Retry
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Add retry button functionality
+                    document.getElementById('retryLoadCandidates')?.addEventListener('click', () => {
+                        loadCandidates();
+                    });
+                }
+            }
+
+            // Theme toggle functionality
+            themeToggle.addEventListener("click", toggleTheme);
+            
+            // Connect button handler
+            connectButton.addEventListener("click", async () => {
+                try {
+                    // Disable button and show loader
+                    connectButton.disabled = true;
+                    connectButton.innerHTML = '<span class="icon-plug mr-2"></span>Reconnect';
+
+                    // Try initializing blockchain connection
+                    const success = await initWeb3();
+                    if (success) {
+                        await loadVotingDates();
+                        await loadCandidates();
+                        showFeedback("Connected to blockchain successfully", "Connection Established", false);
+                    } else {
+                        throw new Error("Blockchain connection failed. Switching to demo mode.");
+                    }
+                } catch (error) {
+                    debugLog("Connection Error", error);
+                    showFeedback(error.message, "Connection Failed", true);
+                    
+                    // Load demo mode as fallback
+                    await loadVotingDates();
+                    await loadCandidates();
+                    showFeedback("Using demo mode due to connection failure.", "Demo Mode", true);
+                } finally {
+                    // Enable button and reset UI
+                    connectButton.disabled = false;
+                    connectButton.innerHTML = '<span class="icon-plug mr-2"></span>Reconnect';
+                }
+            });
+
+            // Refresh button handler
+            refreshButton.addEventListener("click", async () => {
+                debugLog("Refreshing blockchain data...");
+                
+                if (!contractConnected) {
+                    showFeedback("Please connect to the blockchain first", "Connection Required", true);
+                    return;
+                }
+                
+                // Disable button and show loading state
+                refreshButton.disabled = true;
+                refreshButton.innerHTML = '<span class="icon-sync-alt mr-2"></span><span>Refresh Data</span>';
+                
+                try {
+                    // Reload data from blockchain
+                    await loadVotingDates();
+                    await loadCandidates();
+                    showFeedback("Data refreshed successfully", "Refresh Complete", false);
+                } catch (error) {
+                    debugLog("Refresh error:", error);
+                    showFeedback("Failed to refresh data: " + error.message, "Refresh Failed", true);
+                } finally {
+                    // Reset button state
+                    refreshButton.disabled = false;
+                    refreshButton.innerHTML = '<span class="icon-sync-alt mr-2"></span><span>Refresh Data</span>';
+                }
+            });
+
+            // Debug Panel Toggle
+            document.addEventListener("keydown", (e) => {
+                if (e.altKey && e.key === 'd') {
+                    debugPanel.classList.toggle("hidden");
+                }
+            });
+
+            closeDebugPanel.addEventListener("click", () => {
+                debugPanel.classList.add("hidden");
+            });
+
+            // Event Handlers
+            voteButton.addEventListener("click", castVote);
+            logoutButton.addEventListener("click", logout);
+
+            // Initialize page
+            debugLog("Initializing application...");
+
+            try {
+                const connected = await initWeb3();
+                if (connected) {
+                    debugLog("Web3 initialized successfully");
+                    await loadVotingDates();
+                    await loadCandidates();
+                } else {
+                    debugLog("Web3 initialization failed");
+                    showFeedback("Failed to connect to blockchain. Please connect using the Connect button.", "Connection Required", true);
+                }
+            } catch (error) {
+                debugLog("Application initialization error:", error);
+                showFeedback("Failed to initialize application: " + error.message, "Error", true);
+            }
+        });
+    </script>
+    <script>
+        async function makeApiRequest(url, options = {}) {
+            try {
+                // First try the direct API connection
+                const response = await fetch(url, options);
+                
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Received non-JSON response');
+                }
+                
+                return await response.json();
+            } catch (error) {
+                debugLog('Direct API request failed:', error);
+                
+                // Try the proxy endpoint if direct connection fails
+                const path = new URL(url).pathname; // Extract just the path
+                const proxyUrl = `http://localhost:8080/proxy${path}`;
+                try {
+                    const proxyResponse = await fetch(proxyUrl, options);
+                    return await proxyResponse.json();
+                } catch (proxyError) {
+                    debugLog('Proxy API request failed:', proxyError);
+                    throw new Error('All API connections failed');
+                }
+            }
+        }
+    </script>
+    
+    <!-- Particles initialization -->
+    <script>
+        // Helper function to convert hex to RGB
+        function hexToRgb(hex) {
+            let r, g, b;
+            
+            // Remove the hash if present
+            hex = hex.replace('#', '');
+            
+            if (hex.length === 3) {
+                r = parseInt(hex.charAt(0) + hex.charAt(0), 16);
+                g = parseInt(hex.charAt(1) + hex.charAt(1), 16);
+                b = parseInt(hex.charAt(2) + hex.charAt(2), 16);
+            } else if (hex.length === 6) {
+                r = parseInt(hex.substring(0, 2), 16);
+                g = parseInt(hex.substring(2, 4), 16);
+                b = parseInt(hex.substring(4, 6), 16);
+            } else {
+                // Default fallback
+                r = 0;
+                g = 0;
+                b = 0;
+            }
+            
+            return { r: r, g: g, b: b };
+        }
+        
+        // Initialize Particles.js
+        function initParticles() {
+            const fallback = document.getElementById('particles-fallback');
+            
+            try {
+                if (document.getElementById('particles-js') && typeof particlesJS === 'function') {
+                    // Updated Particles.js configuration with enhanced interactivity
+                    particlesJS('particles-js', {
+                        "particles": {
+                            "number": {
+                                "value": 80,
+                                "density": {
+                                    "enable": true,
+                                    "value_area": 800
+                                }
+                            },
+                            "color": {
+                                "value": "#16a34a"  // Using the green color from the theme
+                            },
+                            "shape": {
+                                "type": "circle",
+                                "stroke": {
+                                    "width": 0,
+                                    "color": "#000000"
+                                }
+                            },
+                            "opacity": {
+                                "value": 0.5,
+                                "random": false,
+                                "anim": {
+                                    "enable": true,
+                                    "speed": 1,
+                                    "opacity_min": 0.1,
+                                    "sync": false
+                                }
+                            },
+                            "size": {
+                                "value": 3,
+                                "random": true,
+                                "anim": {
+                                    "enable": false,
+                                    "speed": 40,
+                                    "size_min": 0.1,
+                                    "sync": false
+                                }
+                            },
+                            "line_linked": {
+                                "enable": true,
+                                "distance": 150,
+                                "color": "#16a34a",  // Using the green color from the theme
+                                "opacity": 0.4,
+                                "width": 1
+                            },
+                            "move": {
+                                "enable": true,
+                                "speed": 3,
+                                "direction": "none",
+                                "random": false,
+                                "straight": false,
+                                "out_mode": "out",
+                                "bounce": false,
+                                "attract": {
+                                    "enable": true,
+                                    "rotateX": 600,
+                                    "rotateY": 1200
+                                }
+                            },
+                            "responsive": [{
+                                "breakpoint": 768,
+                                "options": {
+                                    "number": {
+                                        "value": 40
+                                    }
+                                }
+                            }]
+                        },
+                        "interactivity": {
+                            "detect_on": "window",
+                            "events": {
+                                "onhover": {
+                                    "enable": true,
+                                    "mode": "repulse"
+                                },
+                                "onclick": {
+                                    "enable": true,
+                                    "mode": "push"
+                                },
+                                "resize": true
+                            },
+                            "modes": {
+                                "grab": {
+                                    "distance": 180,
+                                    "line_linked": {
+                                        "opacity": 1
+                                    }
+                                },
+                                "bubble": {
+                                    "distance": 250,
+                                    "size": 6,
+                                    "duration": 2,
+                                    "opacity": 0.8,
+                                    "speed": 3
+                                },
+                                "repulse": {
+                                    "distance": 100,
+                                    "duration": 0.4
+                                },
+                                "push": {
+                                    "particles_nb": 4
+                                },
+                                "remove": {
+                                    "particles_nb": 2
+                                }
+                            }
+                        },
+                        "retina_detect": true
+                    });
+                    
+                    // Set up theme-based color changing
+                    updateParticlesColors();
+                    
+                    // Listen for theme changes
+                    const themeToggle = document.getElementById('themeToggle');
+                    if (themeToggle) {
+                        themeToggle.addEventListener('click', function() {
+                            setTimeout(updateParticlesColors, 100); // Small delay to ensure theme has changed
+                        });
+                    }
+                    
+                    // Hide fallback when particles are ready
+                    if (fallback) fallback.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Error initializing Particles.js:", error);
+                // Show fallback on error
+                if (fallback) fallback.style.display = 'block';
+            }
+        }
+        
+        // Function to update particle colors based on theme
+        function updateParticlesColors() {
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const colors = {
+                light: {
+                    particles: '#16a34a',
+                    lines: '#15803d'
+                },
+                dark: {
+                    particles: '#4ade80',
+                    lines: '#22c55e'
+                }
+            };
+            
+            const theme = isDarkMode ? colors.dark : colors.light;
+            
+            if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+                const pJS = window.pJSDom[0].pJS;
+                
+                // Update particle colors
+                pJS.particles.color.value = theme.particles;
+                pJS.particles.line_linked.color = theme.lines;
+                
+                // Update existing particles
+                pJS.particles.array.forEach(p => {
+                    p.color.value = theme.particles;
+                    p.color.rgb = hexToRgb(theme.particles);
+                });
+                
+                // Update lines
+                pJS.particles.line_linked.color_rgb_line = hexToRgb(theme.lines);
+            }
+        }
+        
+        // Initialize immediately if document is already loaded
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(initParticles, 100);
+        } else {
+            // Otherwise wait for DOM to be ready
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initParticles, 100);
+            });
+        }
+        
+        // Backup initialization - if all else fails
+        window.addEventListener('load', function() {
+            if (document.getElementById('particles-js') && !window.pJSDom) {
+                console.log('Backup particles initialization');
+                initParticles();
+            }
+        });
+        
+        // Cleanup function
+        function cleanupParticles() {
+            if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+                window.pJSDom[0].pJS.fn.vendors.destroypJS();
+                window.pJSDom = [];
+            }
+        }
+
+        // Call cleanup when needed
+        window.addEventListener('unload', cleanupParticles);
+    </script>
+</body>
+</html>

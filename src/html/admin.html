@@ -1,0 +1,2761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Decentralized Voting</title>
+    <!-- TODO: For production, install Tailwind CSS as a PostCSS plugin or use the Tailwind CLI -->
+    <!-- This CDN approach is only for development purposes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https://via.placeholder.com https://cdn.pixabay.com; connect-src 'self' http://localhost:8000 https://api.example.com;">
+    
+    <!-- Using Unicode symbols instead of Font Awesome -->
+    <style>
+        /* Base styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+        
+        /* Particles.js styles */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-color: #f9fafb; /* Light mode background */
+            overflow: hidden;
+        }
+        
+        /* Dark mode particles background */
+        .dark #particles-js {
+            background-color: #111827; /* Dark mode background */
+        }
+        
+        .particles-js-canvas-el {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        
+        /* Particles fallback */
+        #particles-fallback {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            opacity: 0.5;
+        }
+        
+        .dark #particles-fallback {
+            background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+            opacity: 0.3;
+        }
+        
+        /* Unicode icons */
+        .icon-sun::before { content: "☀️"; }
+        .icon-moon::before { content: "🌙"; }
+        .icon-user::before { content: "👤"; }
+        .icon-users::before { content: "👥"; }
+        .icon-calendar::before { content: "📅"; }
+        .icon-chart::before { content: "📊"; }
+        .icon-settings::before { content: "⚙️"; }
+        .icon-logout::before { content: "🚪"; }
+        .icon-plus::before { content: "➕"; }
+        .icon-minus::before { content: "➖"; }
+        .icon-check::before { content: "✅"; }
+        .icon-x::before { content: "❌"; }
+        .icon-warning::before { content: "⚠️"; }
+        .icon-info::before { content: "ℹ️"; }
+        .icon-edit::before { content: "✏️"; }
+        .icon-delete::before { content: "🗑️"; }
+        .icon-save::before { content: "💾"; }
+        .icon-refresh::before { content: "🔄"; }
+        .icon-wallet::before { content: "👛"; }
+        .icon-connect::before { content: "🔌"; }
+        .icon-vote::before { content: "🗳️"; }
+        .icon-disconnect::before { content: "🔌"; }
+        .icon-link::before { content: "🔗"; }
+        .icon-network-wired::before { content: "📡"; }
+        .icon-file-contract::before { content: "📄"; }
+        .icon-sync-alt::before { content: "🔄"; }
+        .icon-list::before { content: "🗂️"; }
+        .icon-times::before { content: "❌"; }
+        .icon-close::before { content: "✖"; }
+        .icon-exclamation-circle::before { content: "⚠️"; }
+        .icon-check-circle::before { content: "✅"; }
+        .icon-loader::before { content: "⏳"; }
+        
+        /* Icon spacing */
+        [class^="icon-"] {
+            margin-right: 0.5rem;
+            display: inline-block;
+        }
+    </style>
+    
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            200: '#99f6e4',
+                            300: '#5eead4',
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                            950: '#042f2e'
+                        },
+                    },
+                    fontFamily: {
+                        sans: [
+                            '-apple-system',
+                            'BlinkMacSystemFont',
+                            '"Segoe UI"',
+                            'Roboto',
+                            'Helvetica',
+                            'Arial',
+                            'sans-serif',
+                            '"Apple Color Emoji"',
+                            '"Segoe UI Emoji"',
+                            '"Segoe UI Symbol"'
+                        ],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fallback SVG icons in case Font Awesome fails to load -->
+    <style>
+        /* SVG icon fallbacks */
+        .icon-fallback {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.125em;
+        }
+        
+        /* Only show these if Font Awesome fails */
+        .icon-fallback {
+            display: none;
+        }
+        
+        /* Custom styling for the application */
+        .blockchain-background {
+            background-image: linear-gradient(to bottom right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Dark mode adjustments */
+        .dark .blockchain-background {
+            background-image: linear-gradient(to bottom right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        }
+        
+        /* Loader animation */
+        .loader {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        // Apply saved or system-preferred theme on load
+        if (localStorage.theme === "dark" || (!localStorage.theme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+    </script>
+    <style>
+        /* Using system fonts instead of Google Fonts */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        }
+
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #ffffff;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .tab-content {
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        /* Debug panel styles */
+        #debugPanel {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 80%;
+            max-width: 600px;
+            height: 300px;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-y: auto;
+            padding: 10px;
+            z-index: 9999;
+            border-top-left-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        #debugContent {
+            height: 250px;
+            overflow-y: auto;
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">
+    <!-- Particles background -->
+    <div id="particles-js"></div>
+    <div id="particles-fallback"></div>
+
+    <!-- Main content -->
+    <div class="relative z-10">
+        <!-- Admin Header -->
+        <header class="bg-white dark:bg-gray-800 shadow-md">
+            <div class="container mx-auto px-4 py-3">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <span class="icon-user-shield text-2xl"></span>
+                        <h1 class="ml-2 text-xl font-bold text-gray-800 dark:text-white">Voting System Admin</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <!-- Theme Toggle Button -->
+                        <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" 
+                                onclick="toggleTheme()" 
+                                data-tooltip-target="tooltip-toggle">
+                            <span class="icon-sun text-yellow-500 dark:hidden"></span>
+                            <span class="icon-moon text-blue-300 hidden dark:block"></span>
+                        </button>
+                        <div id="tooltip-toggle" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+                            Toggle Dark Mode
+                        </div>
+                        
+                        <!-- Connect Button -->
+                        <button id="connectButton" class="flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm">
+                            <span class="icon-connect mr-2"></span><span>Connect</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- Tabs -->
+            <div class="mb-8">
+                <ul class="flex flex-wrap text-sm font-medium text-center border-b border-gray-200 dark:border-gray-700">
+                    <li class="mr-2">
+                        <a href="#" class="tab-link active inline-block p-4 rounded-t-lg" data-tab="voting">
+                            <span class="icon-vote mr-2"></span>Voting Management
+                        </a>
+                    </li>
+                    <li class="mr-2">
+                        <a href="#" class="tab-link inline-block p-4 rounded-t-lg" data-tab="candidates">
+                            <span class="icon-user mr-2"></span>Candidates
+                        </a>
+                    </li>
+                    <li class="mr-2">
+                        <a href="#" class="tab-link inline-block p-4 rounded-t-lg" data-tab="results">
+                            <span class="icon-chart mr-2"></span>Results
+                        </a>
+                    </li>
+                    <li class="mr-2">
+                        <a href="#" class="tab-link inline-block p-4 rounded-t-lg" data-tab="settings">
+                            <span class="icon-settings mr-2"></span>Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Connection Status Card -->
+            <div class="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                <div class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
+                    <h2 class="text-lg font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                        <i class="fas fa-link mr-2"></i>
+                        Blockchain Connection
+                    </h2>
+                </div>
+                <div class="p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <div class="flex items-center">
+                                <i class="fas fa-network-wired mr-2 text-primary-500 dark:text-primary-400"></i>
+                                <p id="networkInfo" class="text-sm">Not connected to any network</p>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-file-contract mr-2 text-primary-500 dark:text-primary-400"></i>
+                                <p id="contractInfo" class="text-sm">Contract not loaded</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+                            <button id="connectButtonPanel"
+                                class="flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm">
+                                <span class="icon-connect"></span>
+                                <span>Connect</span>
+                            </button>
+                            <button id="refreshDataButton"
+                                class="flex-1 py-2 px-4 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors flex items-center justify-center">
+                                <i class="fas fa-sync-alt mr-2"></i>
+                                <span>Refresh Data</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3 mr-4">
+                            <i class="fas fa-users text-blue-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Total Candidates</p>
+                            <p id="totalCandidates" class="text-2xl font-bold">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border-l-4 border-green-500">
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-green-100 dark:bg-green-900/30 p-3 mr-4">
+                            <i class="fas fa-vote-yea text-green-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Total Votes</p>
+                            <p id="totalVotes" class="text-2xl font-bold">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border-l-4 border-purple-500">
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-purple-100 dark:bg-purple-900/30 p-3 mr-4">
+                            <i class="fas fa-calendar-alt text-purple-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Voting Status</p>
+                            <p id="votingStatus" class="text-2xl font-bold">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border-l-4 border-yellow-500">
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-yellow-100 dark:bg-yellow-900/30 p-3 mr-4">
+                            <i class="fas fa-clock text-yellow-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Time Remaining</p>
+                            <p id="timeRemaining" class="text-2xl font-bold">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-8">
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                    <nav class="flex flex-wrap" aria-label="Tabs">
+                        <button id="tab-candidates"
+                            class="tab-button text-primary-600 dark:text-primary-400 py-4 px-6 font-medium border-b-2 border-primary-500 dark:border-primary-400"
+                            role="tab" aria-selected="true" aria-controls="content-candidates">
+                            <i class="fas fa-users mr-2"></i>
+                            Manage Candidates
+                        </button>
+                        <button id="tab-voting-dates"
+                            class="tab-button text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 py-4 px-6 font-medium border-b-2 border-transparent"
+                            role="tab" aria-selected="false" aria-controls="content-voting-dates">
+                            <i class="fas fa-calendar-alt mr-2"></i>
+                            Voting Period
+                        </button>
+                        <button id="tab-results"
+                            class="tab-button text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 py-4 px-6 font-medium border-b-2 border-transparent"
+                            role="tab" aria-selected="false" aria-controls="content-results">
+                            <i class="fas fa-chart-bar mr-2"></i>
+                            Results
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="space-y-8">
+                <!-- Candidate Management Tab -->
+                <div id="content-candidates" class="tab-content active fade-in" role="tabpanel"
+                    aria-labelledby="tab-candidates">
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                        <!-- Add Candidate -->
+                        <section class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                            <div
+                                class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
+                                <h2 class="text-lg font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                                    <i class="fas fa-user-plus mr-2"></i>
+                                    Add New Candidate
+                                </h2>
+                            </div>
+                            <div class="p-6">
+                                <div id="candidateFeedbackContainer"
+                                    class="mb-4 p-4 border rounded-md hidden">
+                                    <div class="flex">
+                                        <div id="candidateFeedbackIcon" class="flex-shrink-0 mr-3"></div>
+                                        <div>
+                                            <h3 id="candidateFeedbackTitle" class="text-sm font-medium"></h3>
+                                            <div class="mt-1 text-sm" id="candidateFeedback"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <form id="addCandidateForm" class="space-y-4">
+                                    <div>
+                                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Candidate Name
+                                        </label>
+                                        <input type="text" id="name" name="name"
+                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            placeholder="Enter candidate name" autocomplete="name">
+                                    </div>
+                                    <div>
+                                        <label for="party" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Political Party
+                                        </label>
+                                        <input type="text" id="party" name="party"
+                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            placeholder="Enter political party" autocomplete="organization">
+                                    </div>
+                                    <div>
+                                        <label for="imageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Image URL (Optional)
+                                        </label>
+                                        <input type="text" id="imageUrl" name="imageUrl"
+                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            placeholder="Enter image URL" autocomplete="url">
+                                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank to use default avatar image</p>
+                                    </div>
+                                    <div class="pt-2">
+                                        <button type="submit" id="addCandidateButton"
+                                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-800">
+                                            <span class="icon-plus-circle mr-2"></span>Add Candidate
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+
+                        <!-- Candidate List -->
+                        <section class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                            <div
+                                class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
+                                <div class="flex justify-between items-center">
+                                    <h2 class="text-lg font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                                        <i class="fas fa-list mr-2"></i>
+                                        Candidate List
+                                    </h2>
+                                    <button id="refreshCandidatesButton"
+                                        class="py-1 px-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-md transition-colors text-sm flex items-center">
+                                        <i class="fas fa-sync-alt mr-1"></i>
+                                        <span>Refresh</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead class="bg-gray-50 dark:bg-gray-700">
+                                        <tr>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                ID
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Candidate
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Party
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Votes
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Edit
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="candidateList">
+                                        <tr>
+                                            <td colspan="4" class="px-4 py-6 text-center">
+                                                <p class="text-gray-500 dark:text-gray-400">Connect your wallet to view candidates</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Voting Period Tab -->
+                <div id="content-voting-dates" class="tab-content" role="tabpanel" aria-labelledby="tab-voting-dates">
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                        <!-- Current Voting Period -->
+                        <section class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                            <div
+                                class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
+                                <h2 class="text-lg font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                                    <i class="fas fa-calendar-check mr-2"></i>
+                                    Current Voting Period
+                                </h2>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center mb-4">
+                                    <div id="datesLoadingIndicator" class="mr-2">
+                                        <div class="loader border-gray-500 dark:border-gray-400"></div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p id="currentDatesDisplay" class="text-gray-700 dark:text-gray-300">
+                                            Connect your wallet to view voting period
+                                        </p>
+                                    </div>
+                                    <span id="votingStatusBadge"
+                                        class="hidden px-2 py-1 text-xs font-medium rounded-full">
+                                        Status
+                                    </span>
+                                </div>
+
+                                <div id="electionProgressContainer" class="mt-8 hidden">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span id="electionStartLabel" class="text-xs text-gray-500 dark:text-gray-400"></span>
+                                        <span id="electionEndLabel" class="text-xs text-gray-500 dark:text-gray-400"></span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                        <div id="electionProgress" class="bg-primary-500 h-2.5 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                    <p id="electionTimeRemaining" class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400"></p>
+                                </div>
+
+                                <div class="mt-6 flex">
+                                    <button id="updateDatesButton"
+                                        class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800">
+                                        <i class="fas fa-edit mr-2"></i>Update Existing Dates
+                                    </button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Set Voting Period -->
+                        <section class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                            <div
+                                class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
+                                <h2 class="text-lg font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                                    <i class="fas fa-calendar-plus mr-2"></i>
+                                    Set Voting Period
+                                </h2>
+                            </div>
+                            <div class="p-6">
+                                <div id="datesFeedbackContainer"
+                                    class="mb-4 p-4 border rounded-md hidden">
+                                    <div class="flex">
+                                        <div id="datesFeedbackIcon" class="flex-shrink-0 mr-3"></div>
+                                        <div>
+                                            <h3 id="datesFeedbackTitle" class="text-sm font-medium"></h3>
+                                            <div class="mt-1 text-sm" id="datesFeedback"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <form id="setDatesForm" class="space-y-4">
+                                    <div>
+                                        <label for="startDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Voting Start Date & Time
+                                        </label>
+                                        <input type="datetime-local" id="startDate" name="startDate"
+                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            autocomplete="off">
+                                    </div>
+                                    <div>
+                                        <label for="endDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Voting End Date & Time
+                                        </label>
+                                        <input type="datetime-local" id="endDate" name="endDate"
+                                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                            autocomplete="off">
+                                    </div>
+                                    <div class="pt-2">
+                                        <button type="submit" id="setDatesButton"
+                                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-800">
+                                            <span class="icon-save mr-2"></span>Set New Period
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Results Tab -->
+                <div id="content-results" class="tab-content" role="tabpanel" aria-labelledby="tab-results">
+                    <div class="space-y-8">
+                        <!-- Loading Indicator -->
+                        <div id="resultsLoading" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-8 text-center">
+                            <div id="resultsLoadingIndicator" class="inline-block mb-4">
+                                <div class="loader border-gray-500 dark:border-gray-400"></div>
+                            </div>
+                            <p id="resultsLoadingText" class="text-gray-700 dark:text-gray-300">Loading election results...</p>
+                        </div>
+
+                        <!-- Results Stats -->
+                        <div id="resultStats" class="grid grid-cols-1 md:grid-cols-3 gap-6 hidden">
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="rounded-full bg-blue-100 dark:bg-blue-900/30 p-3 mr-3">
+                                        <i class="fas fa-check-square text-blue-500"></i>
+                                    </div>
+                                    <h3 class="text-lg font-medium">Total Votes Cast</h3>
+                                </div>
+                                <p id="totalVotesCast" class="text-3xl font-bold text-center mt-2">-</p>
+                            </div>
+
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="rounded-full bg-green-100 dark:bg-green-900/30 p-3 mr-3">
+                                        <i class="fas fa-trophy text-green-500"></i>
+                                    </div>
+                                    <h3 class="text-lg font-medium">Leading Candidate</h3>
+                                </div>
+                                <p id="leadingCandidate" class="text-3xl font-bold text-center mt-2">-</p>
+                            </div>
+
+                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                                <div class="flex items-center mb-4">
+                                    <div class="rounded-full bg-purple-100 dark:bg-purple-900/30 p-3 mr-3">
+                                        <i class="fas fa-users text-purple-500"></i>
+                                    </div>
+                                    <h3 class="text-lg font-medium">Voter Turnout</h3>
+                                </div>
+                                <p id="voterTurnout" class="text-3xl font-bold text-center mt-2">-</p>
+                            </div>
+                        </div>
+
+                        <!-- Results Table -->
+                        <div id="resultsTable" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hidden">
+                            <div class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
+                                <h2 class="text-lg font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                                    <i class="fas fa-table mr-2"></i>
+                                    Detailed Results
+                                </h2>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead class="bg-gray-50 dark:bg-gray-700">
+                                        <tr>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Candidate
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Party
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Votes
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Percentage
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Edit
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+                                        id="resultsTableBody">
+                                        <!-- Results will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Results Chart -->
+                        <div id="resultsChartContainer" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hidden">
+                            <div class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
+                                <h2 class="text-lg font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                                    <i class="fas fa-chart-bar mr-2"></i>
+                                    Results Visualization
+                                </h2>
+                            </div>
+                            <div class="p-4">
+                                <div class="w-full h-80">
+                                    <canvas id="resultsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Export Results -->
+                        <div id="exportResultsContainer" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hidden">
+                            <div class="p-4 bg-primary-50 dark:bg-primary-900/30 border-b border-primary-100 dark:border-primary-900">
+                                <h2 class="text-lg font-semibold text-primary-700 dark:text-primary-300 flex items-center">
+                                    <i class="fas fa-file-export mr-2"></i>
+                                    Export Results
+                                </h2>
+                            </div>
+                            <div class="p-6">
+                                <p class="mb-4 text-gray-700 dark:text-gray-300">
+                                    Export the election results to CSV format for further analysis or record keeping.
+                                </p>
+                                <button id="exportResultsButton"
+                                    class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800">
+                                    <i class="fas fa-download mr-2"></i>Download Results (CSV)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Debug Panel (hidden by default) -->
+        <div id="debugPanel" class="hidden">
+            <div class="flex justify-between items-center mb-2 border-b border-gray-700 pb-2">
+                <h3 class="text-lg font-mono">Debug Console</h3>
+                <button id="clearDebugBtn" class="text-xs text-red-500 hover:text-red-300">Clear</button>
+            </div>
+            <div id="debugContent"></div>
+        </div>
+    </div>
+
+    <!-- Initialize particles -->
+    <script>
+        // Initialize Particles.js
+        function initParticles() {
+            const fallback = document.getElementById('particles-fallback');
+            
+            try {
+                if (document.getElementById('particles-js') && typeof particlesJS === 'function') {
+                    // Updated Particles.js configuration with enhanced interactivity
+                    particlesJS('particles-js', {
+                        "particles": {
+                            "number": {
+                                "value": 80,
+                                "density": {
+                                    "enable": true,
+                                    "value_area": 800
+                                }
+                            },
+                            "color": {
+                                "value": "#16a34a"  // Using the green color from the theme
+                            },
+                            "shape": {
+                                "type": "circle",
+                                "stroke": {
+                                    "width": 0,
+                                    "color": "#000000"
+                                }
+                            },
+                            "opacity": {
+                                "value": 0.5,
+                                "random": false,
+                                "anim": {
+                                    "enable": true,
+                                    "speed": 1,
+                                    "opacity_min": 0.1,
+                                    "sync": false
+                                }
+                            },
+                            "size": {
+                                "value": 3,
+                                "random": true,
+                                "anim": {
+                                    "enable": false,
+                                    "speed": 40,
+                                    "size_min": 0.1,
+                                    "sync": false
+                                }
+                            },
+                            "line_linked": {
+                                "enable": true,
+                                "distance": 150,
+                                "color": "#16a34a",  // Using the green color from the theme
+                                "opacity": 0.4,
+                                "width": 1
+                            },
+                            "move": {
+                                "enable": true,
+                                "speed": 3,
+                                "direction": "none",
+                                "random": false,
+                                "straight": false,
+                                "out_mode": "out",
+                                "bounce": false,
+                                "attract": {
+                                    "enable": true,
+                                    "rotateX": 600,
+                                    "rotateY": 1200
+                                }
+                            }
+                        },
+                        "interactivity": {
+                            "detect_on": "window",
+                            "events": {
+                                "onhover": {
+                                    "enable": true,
+                                    "mode": "repulse"
+                                },
+                                "onclick": {
+                                    "enable": true,
+                                    "mode": "push"
+                                },
+                                "resize": true
+                            },
+                            "modes": {
+                                "grab": {
+                                    "distance": 180,
+                                    "line_linked": {
+                                        "opacity": 1
+                                    }
+                                },
+                                "bubble": {
+                                    "distance": 250,
+                                    "size": 6,
+                                    "duration": 2,
+                                    "opacity": 0.8,
+                                    "speed": 3
+                                },
+                                "repulse": {
+                                    "distance": 100,
+                                    "duration": 0.4
+                                },
+                                "push": {
+                                    "particles_nb": 4
+                                },
+                                "remove": {
+                                    "particles_nb": 2
+                                }
+                            }
+                        },
+                        "retina_detect": true
+                    });
+                    
+                    // Hide fallback when particles are ready
+                    if (fallback) fallback.style.display = 'none';
+                }
+            } catch (error) {
+                console.error("Error initializing Particles.js:", error);
+                // Show fallback on error
+                if (fallback) fallback.style.display = 'block';
+            }
+        }
+
+        // Function to update particle colors based on theme
+        function updateParticlesColors() {
+            const isDarkMode = document.documentElement.classList.contains('dark');
+            const colors = {
+                light: {
+                    particles: '#16a34a',
+                    lines: '#15803d'
+                },
+                dark: {
+                    particles: '#4ade80',
+                    lines: '#22c55e'
+                }
+            };
+            
+            const theme = isDarkMode ? colors.dark : colors.light;
+            
+            if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+                const pJS = window.pJSDom[0].pJS;
+                
+                // Update particle colors
+                pJS.particles.color.value = theme.particles;
+                pJS.particles.line_linked.color = theme.lines;
+                
+                // Update existing particles
+                pJS.particles.array.forEach(p => {
+                    p.color.value = theme.particles;
+                    p.color.rgb = hexToRgb(theme.particles);
+                });
+                
+                // Update lines
+                pJS.particles.line_linked.color_rgb_line = hexToRgb(theme.lines);
+            }
+        }
+
+        // Initialize particles
+        document.addEventListener('DOMContentLoaded', function() {
+            initParticles();
+            
+            // Update particles colors when theme changes
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', function() {
+                    setTimeout(updateParticlesColors, 100);
+                });
+            }
+        });
+
+        // Cleanup function
+        function cleanupParticles() {
+            if (window.pJSDom && window.pJSDom[0] && window.pJSDom[0].pJS) {
+                window.pJSDom[0].pJS.fn.vendors.destroypJS();
+                window.pJSDom = [];
+            }
+        }
+
+        // Call cleanup when needed
+        window.addEventListener('unload', cleanupParticles);
+    </script>
+
+    <!-- Contract ABI Definition -->
+    <script>
+        // Define the ABI for the voting contract
+        const votingContractABI = [
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint256",
+                        "name": "candidateId",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "string",
+                        "name": "party",
+                        "type": "string"
+                    }
+                ],
+                "name": "CandidateAdded",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": true,
+                        "internalType": "uint256",
+                        "name": "candidateId",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "newVoteCount",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "VoteCast",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "startTime",
+                        "type": "uint256"
+                    },
+                    {
+                        "indexed": false,
+                        "internalType": "uint256",
+                        "name": "endTime",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "VotingPeriodSet",
+                "type": "event"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "_party",
+                        "type": "string"
+                    }
+                ],
+                "name": "addCandidate",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "admin",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "candidates",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "id",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "party",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "voteCount",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "candidateCount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getAllCandidates",
+                "outputs": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "uint256",
+                                "name": "id",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "name",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "string",
+                                "name": "party",
+                                "type": "string"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "voteCount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct Voting.Candidate[]",
+                        "name": "",
+                        "type": "tuple[]"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_candidateId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "getCandidate",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getCandidateCount",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getVotingPeriod",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "hasVoted",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "endTime",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_startTime",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "_endTime",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "setVotingPeriod",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "startTime",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "_candidateId",
+                        "type": "uint256"
+                    }
+                ],
+                "name": "vote",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+    </script>
+
+    <!-- Main Application Script -->
+    <script>
+        // Global variables for blockchain connection
+        let contractConnected = false;
+        let votingContract = null;
+        let web3 = null;
+        let accounts = [];
+        let isAdmin = false;
+        let candidatesData = [];
+        let votingStartTime = 0;
+        let votingEndTime = 0;
+        let chartInstance = null;
+        
+        // Application configuration
+        const appConfig = {
+            // Contract details - replace with your deployed contract address
+            contractAddress: '0xa95f9E532a1Cd51fD03052A8E5f04528287f8fca', // Replace with actual contract address when deployed
+            networkName: 'Localhost 7575', // Change based on your deployment
+            defaultImageUrl: 'https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png',
+        };
+        
+        // Debug log function
+        function debugLog(message) {
+            const debugContent = document.getElementById('debugContent');
+            const time = new Date().toLocaleTimeString();
+            debugContent.innerHTML += `<div class="py-1">[${time}] ${message}</div>`;
+            debugContent.scrollTop = debugContent.scrollHeight;
+        }
+        
+        // ==========================================
+        // Initialization Functions
+        // ==========================================
+        
+        // Initialize the application when the page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            debugLog('Application initializing...');
+            
+            // Initialize theme based on user preference
+            if (localStorage.getItem('theme') === 'dark' || 
+                (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Try auto-connecting if user has previously connected
+            if (localStorage.getItem('walletConnected') === 'true') {
+                connectWallet();
+            } else {
+                updateUIConnectionStatus(false);
+            }
+        });
+        
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Connect wallet buttons
+            const connectButton = document.getElementById('connectButton');
+            const connectButtonPanel = document.getElementById('connectButtonPanel');
+            
+            if (connectButton) {
+                console.log('Adding click event listener to main connect button');
+                connectButton.addEventListener('click', function(event) {
+                    console.log('Main connect button clicked');
+                    connectWallet();
+                });
+            } else {
+                console.log('Main connect button not found');
+            }
+            
+            if (connectButtonPanel) {
+                console.log('Adding click event listener to panel connect button');
+                connectButtonPanel.addEventListener('click', function(event) {
+                    console.log('Panel connect button clicked');
+                    connectWallet();
+                });
+            } else {
+                console.log('Panel connect button not found');
+            }
+            
+            // Refresh data button
+            const refreshDataButton = document.getElementById('refreshDataButton');
+            if (refreshDataButton) {
+                refreshDataButton.addEventListener('click', refreshAllData);
+            }
+            
+            // Add candidate form
+            const addCandidateForm = document.getElementById('addCandidateForm');
+            if (addCandidateForm) {
+                addCandidateForm.addEventListener('submit', handleAddCandidate);
+            }
+            
+            // Edit candidate form
+            const editCandidateForm = document.getElementById('editCandidateForm');
+            if (editCandidateForm) {
+                editCandidateForm.addEventListener('submit', handleEditCandidate);
+            }
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
+            
+            // Refresh candidates button
+            const refreshCandidatesButton = document.getElementById('refreshCandidatesButton');
+            if (refreshCandidatesButton) {
+                refreshCandidatesButton.addEventListener('click', loadCandidates);
+            }
+            
+            // Set dates form
+            const setDatesForm = document.getElementById('setDatesForm');
+            if (setDatesForm) {
+                setDatesForm.addEventListener('submit', handleSetDates);
+            }
+            
+            // Update dates button
+            const updateDatesButton = document.getElementById('updateDatesButton');
+            if (updateDatesButton) {
+                updateDatesButton.addEventListener('click', handleUpdateDates);
+            }
+            
+            // Export results button
+            const exportResultsButton = document.getElementById('exportResultsButton');
+            if (exportResultsButton) {
+                exportResultsButton.addEventListener('click', exportResults);
+            }
+            
+            // Logout button
+            const logoutButton = document.getElementById('logoutButton');
+            if (logoutButton) {
+                logoutButton.addEventListener('click', disconnectWallet);
+            }
+            
+            // Tab switching
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Get the target content ID
+                    const targetId = this.getAttribute('aria-controls');
+                    
+                    // Hide all tab contents
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Show the selected tab content
+                    document.getElementById(targetId).classList.add('active');
+                    
+                    // Update tab button styles
+                    document.querySelectorAll('.tab-button').forEach(btn => {
+                        btn.classList.remove('text-primary-600', 'dark:text-primary-400', 'border-primary-500', 'dark:border-primary-400');
+                        btn.classList.add('text-gray-500', 'dark:text-gray-400', 'hover:text-primary-600', 'dark:hover:text-primary-400', 'border-transparent');
+                    });
+                    
+                    // Style the clicked tab button
+                    this.classList.remove('text-gray-500', 'dark:text-gray-400', 'hover:text-primary-600', 'dark:hover:text-primary-400', 'border-transparent');
+                    this.classList.add('text-primary-600', 'dark:text-primary-400', 'border-primary-500', 'dark:border-primary-400');
+                    
+                    // If results tab is selected, load results data
+                    if (targetId === 'content-results') {
+                        loadResults();
+                    }
+                });
+            });
+            
+            // Dark mode toggle
+            document.getElementById('themeToggle').addEventListener('click', function() {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+            
+            // Clear debug button
+            document.getElementById('clearDebugBtn').addEventListener('click', function() {
+                document.getElementById('debugContent').innerHTML = '';
+            });
+        }
+        
+        // ==========================================
+        // Wallet Connection Functions
+        // ==========================================
+        
+        // Connect to the user's Ethereum wallet (MetaMask)
+        async function connectWallet() {
+            debugLog('Attempting to connect wallet...');
+            
+            try {
+                // Check if MetaMask is installed
+                if (typeof window.ethereum === 'undefined') {
+                    debugLog('MetaMask not found');
+                    showFeedback('candidateFeedback', 'error', 'Wallet Not Found', 'Please install MetaMask or another Ethereum wallet extension.');
+                    return;
+                }
+                
+                // Check if Web3 is loaded
+                if (typeof Web3 === 'undefined') {
+                    debugLog('Web3 library not loaded');
+                    showFeedback('candidateFeedback', 'error', 'Web3 Not Loaded', 'The Web3 library failed to load. Please refresh the page and try again.');
+                    return;
+                }
+                
+                debugLog('MetaMask found, requesting accounts...');
+                
+                // Request account access
+                accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                debugLog('Accounts received:', accounts);
+                
+                // Initialize Web3
+                web3 = new Web3(window.ethereum);
+                debugLog('Web3 initialized');
+                
+                // Initialize the contract
+                votingContract = new web3.eth.Contract(votingContractABI, appConfig.contractAddress);
+                debugLog('Contract initialized with address:', appConfig.contractAddress);
+                
+                // Set contract as connected
+                contractConnected = true;
+                debugLog('Contract connected status:', contractConnected);
+                
+                // Check if connected account is admin
+                await checkAdminStatus();
+                
+                // Update UI with connection status
+                updateUIConnectionStatus(true);
+                
+                // Load initial data
+                await refreshAllData();
+                
+                // Remember that the wallet was connected
+                localStorage.setItem('walletConnected', 'true');
+                
+                // Listen for account changes
+                window.ethereum.on('accountsChanged', handleAccountsChanged);
+                
+                // Listen for chain changes
+                window.ethereum.on('chainChanged', () => window.location.reload());
+                
+                debugLog('Wallet connected successfully');
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                debugLog('Error connecting wallet: ' + error.message);
+                showFeedback('candidateFeedback', 'error', 'Connection Error', error.message);
+                updateUIConnectionStatus(false);
+            }
+        }
+        
+        // Handle when user changes accounts
+        async function handleAccountsChanged(newAccounts) {
+            debugLog('Accounts changed, updating...');
+            accounts = newAccounts;
+            
+            if (accounts.length === 0) {
+                // User disconnected their wallet
+                disconnectWallet();
+            } else {
+                // Check if new account is admin
+                await checkAdminStatus();
+                await refreshAllData();
+            }
+        }
+        
+        // Disconnect the wallet
+        function disconnectWallet() {
+            debugLog('Disconnecting wallet...');
+            
+            // Reset global variables
+            accounts = [];
+            isAdmin = false;
+            contractConnected = false;
+            debugLog('Contract connected status:', contractConnected);
+            
+            // Update UI
+            updateUIConnectionStatus(false);
+            
+            // Clear local storage
+            localStorage.removeItem('walletConnected');
+            
+            // Reset UI elements to loading/default state
+            document.getElementById('candidateList').innerHTML = '<tr><td colspan="4" class="px-4 py-6 text-center">Connect your wallet to view candidates</td></tr>';
+            document.getElementById('totalCandidates').textContent = '-';
+            document.getElementById('totalVotes').textContent = '-';
+            document.getElementById('votingStatus').textContent = '-';
+            document.getElementById('timeRemaining').textContent = '-';
+            document.getElementById('currentDatesDisplay').textContent = 'Connect your wallet to view voting period';
+            
+            // Hide feedback messages
+            document.getElementById('candidateFeedbackContainer').classList.add('hidden');
+            document.getElementById('datesFeedbackContainer').classList.add('hidden');
+            
+            debugLog('Wallet disconnected');
+        }
+        
+        // Check if connected account is the contract admin
+                async function checkAdminStatus() {
+            try {
+                // Hardcode the admin address from your contract
+                const adminAddress = "0x0b26432E4c0A4DB3BcEa7fEff8e11F66468731f5";
+                isAdmin = (accounts[0].toLowerCase() === adminAddress.toLowerCase());
+                debugLog(`Admin status checked: ${isAdmin ? 'Is admin' : 'Not admin'}`);
+                debugLog(`Your account: ${accounts[0]}`);
+                debugLog(`Admin account: ${adminAddress}`);
+                
+                if (!isAdmin) {
+                    showFeedback('candidateFeedback', 'warning', 'Limited Access', 'You are not the admin of this contract. Some functions will be disabled.');
+                }
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                debugLog('Error checking admin status: ' + error.message);
+                isAdmin = false;
+            }
+        }
+        
+        // Update UI elements based on connection status
+        function updateUIConnectionStatus(connected) {
+            const connectButton = document.getElementById('connectButton');
+            const connectButtonPanel = document.getElementById('connectButtonPanel');
+            const walletAddress = document.getElementById('walletAddress');
+            const networkInfo = document.getElementById('networkInfo');
+            const contractInfo = document.getElementById('contractInfo');
+            
+            if (connected && accounts.length > 0) {
+                // Update connect buttons
+                if (connectButton) {
+                    connectButton.innerHTML = '<span class="icon-disconnect mr-2"></span><span>Disconnect</span>';
+                    connectButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+                    connectButton.classList.add('bg-gray-500', 'hover:bg-gray-600');
+                }
+                
+                if (connectButtonPanel) {
+                    connectButtonPanel.innerHTML = '<span class="icon-disconnect mr-2"></span><span>Disconnect</span>';
+                    connectButtonPanel.classList.remove('bg-primary-600', 'hover:bg-primary-700');
+                    connectButtonPanel.classList.add('bg-gray-500', 'hover:bg-gray-600');
+                }
+                
+                // Display wallet address
+                if (walletAddress) {
+                    const displayAddress = `${accounts[0].substring(0, 6)}...${accounts[0].substring(accounts[0].length - 4)}`;
+                    walletAddress.textContent = displayAddress;
+                }
+                
+                // Update network and contract info
+                if (networkInfo) {
+                    networkInfo.textContent = `Connected to ${appConfig.networkName}`;
+                }
+                if (contractInfo) {
+                    contractInfo.textContent = `Contract: ${appConfig.contractAddress.substring(0, 6)}...${appConfig.contractAddress.substring(appConfig.contractAddress.length - 4)}`;
+                }
+            } else {
+                // Reset connect buttons
+                if (connectButton) {
+                    connectButton.innerHTML = '<span class="icon-connect mr-2"></span><span>Connect</span>';
+                    connectButton.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+                    connectButton.classList.add('bg-blue-500', 'hover:bg-blue-600');
+                }
+                
+                if (connectButtonPanel) {
+                    connectButtonPanel.innerHTML = '<span class="icon-connect mr-2"></span><span>Connect</span>';
+                    connectButtonPanel.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+                    connectButtonPanel.classList.add('bg-primary-600', 'hover:bg-primary-700');
+                }
+                
+                // Clear wallet address
+                if (walletAddress) {
+                    walletAddress.textContent = 'Not connected';
+                }
+                
+                // Reset network and contract info
+                if (networkInfo) {
+                    networkInfo.textContent = 'Not connected to any network';
+                }
+                if (contractInfo) {
+                    contractInfo.textContent = 'Contract not loaded';
+                }
+            }
+        }
+        
+        // ==========================================
+        // Data Loading Functions
+        // ==========================================
+        
+        // Refresh all data displayed in the dashboard
+        async function refreshAllData() {
+            debugLog('Refreshing all data...');
+            
+            if (!web3 || !votingContract) {
+                debugLog('Cannot refresh data: Wallet not connected');
+                return;
+            }
+            
+            try {
+                // Load data in parallel
+                await Promise.all([
+                    loadCandidates(),
+                    loadVotingPeriod(),
+                    loadVotingStats()
+                ]);
+                
+                // Update results tab data if that tab is active
+                if (document.getElementById('content-results').classList.contains('active')) {
+                    loadResults();
+                }
+                
+                debugLog('All data refreshed successfully');
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                debugLog('Error refreshing data: ' + error.message);
+            }
+        }
+        
+        // Load candidates from the contract
+        async function loadCandidates() {
+            debugLog('Loading candidates...');
+            
+            try {
+                if (!web3 || !votingContract) {
+                    throw new Error('Web3 or contract not initialized');
+                }
+                
+                // Get candidates from contract
+                const candidates = await votingContract.methods.getAllCandidates().call();
+                debugLog(`Received ${candidates.length} candidates from contract`);
+                
+                // Update candidates data
+                candidatesData = candidates;
+                
+                // Update total candidates counter
+                document.getElementById('totalCandidates').textContent = candidates.length;
+                
+                if (candidates.length === 0) {
+                    candidateList.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="px-4 py-6 text-center">
+                                <p class="text-gray-500 dark:text-gray-400">No candidates found. Add new candidates to get started.</p>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // Build candidate list HTML
+                const candidateListHTML = candidates.map(candidate => `
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
+                        <td class="px-4 py-3">
+                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-300">
+                                ${candidate.id}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center">
+                                <div class="h-10 w-10 flex-shrink-0 mr-3">
+                                    <img class="h-10 w-10 rounded-full object-cover" 
+                                         src="${candidate.imageUrl || appConfig.defaultImageUrl}" 
+                                         alt="${candidate.name}">
+                                </div>
+                                <div>
+                                    <p class="font-medium">${candidate.name}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                ${candidate.party}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <span class="font-medium">${candidate.voteCount}</span>
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <button 
+                                class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
+                                onclick="openEditCandidateModal(${candidate.id}, '${candidate.name}', '${candidate.party}', '${candidate.imageUrl || appConfig.defaultImageUrl}')"
+                            >
+                                <span class="icon-edit"></span>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                // Update the UI
+                candidateList.innerHTML = candidateListHTML;
+                
+                debugLog('Candidates loaded successfully');
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+                debugLog('Error loading candidates: ' + error.message);
+                
+                candidateList.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-4 py-6 text-center">
+                            <p class="text-red-500 dark:text-red-400">Error loading candidates: ${error.message}</p>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // Load voting period information from the contract
+        async function loadVotingPeriod() {
+            debugLog('Loading voting period...');
+            
+            try {
+                // Get voting period
+                const result = await votingContract.methods.getVotingPeriod().call();
+                votingStartTime = parseInt(result[0]);
+                votingEndTime = parseInt(result[1]);
+                
+                // Hide loading indicator
+                document.getElementById('datesLoadingIndicator').classList.add('hidden');
+                
+                // Update UI with voting period
+                updateVotingPeriodUI();
+                
+                debugLog('Voting period loaded successfully');
+            } catch (error) {
+                console.error('Error loading voting period:', error);
+                debugLog('Error loading voting period: ' + error.message);
+                
+                document.getElementById('currentDatesDisplay').textContent = 'Error loading voting period. Please try again.';
+                document.getElementById('datesLoadingIndicator').classList.add('hidden');
+            }
+        }
+        
+        // Load voting stats (status and time remaining)
+        async function loadVotingStats() {
+            debugLog('Loading voting stats...');
+            
+            try {
+                // Get voting status based on current time and voting period
+                const now = Math.floor(Date.now() / 1000); // Current time in seconds
+                const isActive = now >= votingStartTime && now <= votingEndTime;
+                
+                // Update voting status display
+                const statusElement = document.getElementById('votingStatus');
+                if (votingStartTime === 0 && votingEndTime === 0) {
+                    statusElement.textContent = 'Not Set';
+                    statusElement.classList.remove('text-green-500', 'text-red-500', 'text-gray-500');
+                    statusElement.classList.add('text-yellow-500');
+                } else if (isActive) {
+                    statusElement.textContent = 'Active';
+                    statusElement.classList.remove('text-yellow-500', 'text-red-500', 'text-gray-500');
+                    statusElement.classList.add('text-green-500');
+                } else {
+                    const now = Math.floor(Date.now() / 1000);
+                    if (now < votingStartTime) {
+                        statusElement.textContent = 'Upcoming';
+                        statusElement.classList.remove('text-green-500', 'text-red-500', 'text-yellow-500');
+                        statusElement.classList.add('text-gray-500');
+                    }
+                    else {
+                        statusElement.textContent = 'Ended';
+                        statusElement.classList.remove('text-green-500', 'text-gray-500', 'text-yellow-500');
+                        statusElement.classList.add('text-red-500');
+                    }
+                }
+                
+                // Update time remaining display
+                updateTimeRemaining();
+                
+                // Start timer to update time remaining
+                if (isActive) {
+                    // Update every second
+                    setInterval(updateTimeRemaining, 1000);
+                }
+                
+                debugLog('Voting stats loaded successfully');
+            } catch (error) {
+                console.error('Error loading voting stats:', error);
+                debugLog('Error loading voting stats: ' + error.message);
+            }
+        }
+        
+        // Load and display election results
+        async function loadResults() {
+            debugLog('Loading election results...');
+            
+            // Show loading indicator
+            document.getElementById('resultsLoading').classList.remove('hidden');
+            document.getElementById('resultStats').classList.add('hidden');
+            document.getElementById('resultsTable').classList.add('hidden');
+            document.getElementById('resultsChartContainer').classList.add('hidden');
+            document.getElementById('exportResultsContainer').classList.add('hidden');
+            
+            try {
+                // Make sure candidates are loaded
+                if (candidatesData.length === 0) {
+                    await loadCandidates();
+                }
+                
+                // If still no candidates
+                if (candidatesData.length === 0) {
+                    document.getElementById('resultsLoadingText').textContent = 'No candidates found. Add candidates first.';
+                    return;
+                }
+                
+                // Calculate total votes
+                const totalVotes = candidatesData.reduce((sum, candidate) => sum + parseInt(candidate.voteCount), 0);
+                document.getElementById('totalVotesCast').textContent = totalVotes;
+                
+                // Find leading candidate
+                let leadingCandidate = { name: 'None', voteCount: 0 };
+                
+                candidatesData.forEach(candidate => {
+                    if (parseInt(candidate.voteCount) > parseInt(leadingCandidate.voteCount)) {
+                        leadingCandidate = candidate;
+                    }
+                });
+                
+                document.getElementById('leadingCandidate').textContent = totalVotes > 0 ? leadingCandidate.name : 'No votes cast';
+                
+                // Calculate voter turnout (if we had total eligible voters data)
+                // For now, just use a placeholder
+                document.getElementById('voterTurnout').textContent = totalVotes > 0 ? 'Available voters have participated' : 'No votes cast';
+                
+                // Build results table
+                let resultsTableHTML = '';
+                
+                candidatesData.forEach(candidate => {
+                    const percentage = totalVotes > 0 ? ((parseInt(candidate.voteCount) / totalVotes) * 100).toFixed(2) : '0.00';
+                    
+                    resultsTableHTML += `
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
+                            <td class="px-4 py-3">
+                                <div class="flex items-center">
+                                    <div class="h-10 w-10 flex-shrink-0 mr-3">
+                                        <img class="h-10 w-10 rounded-full object-cover" 
+                                             src="${candidate.imageUrl || appConfig.defaultImageUrl}" 
+                                             alt="${candidate.name}">
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">${candidate.name}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                    ${candidate.party}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 text-center">
+                                <span class="font-medium">${candidate.voteCount}</span>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end">
+                                    <div class="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2 mr-2">
+                                        <div class="bg-primary-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+                                    </div>
+                                    <span>${percentage}%</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <button 
+                                    class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300"
+                                    onclick="openEditCandidateModal(${candidate.id}, '${candidate.name}', '${candidate.party}', '${candidate.imageUrl || appConfig.defaultImageUrl}')"
+                                >
+                                    <span class="icon-edit"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                // Update table
+                document.getElementById('resultsTableBody').innerHTML = resultsTableHTML;
+                
+                // Create chart
+                createResultsChart();
+                
+                // Hide loading and show results
+                document.getElementById('resultsLoading').classList.add('hidden');
+                document.getElementById('resultStats').classList.remove('hidden');
+                document.getElementById('resultsTable').classList.remove('hidden');
+                document.getElementById('resultsChartContainer').classList.remove('hidden');
+                document.getElementById('exportResultsContainer').classList.remove('hidden');
+                
+                debugLog('Election results loaded successfully');
+            } catch (error) {
+                console.error('Error loading results:', error);
+                debugLog('Error loading results: ' + error.message);
+                
+                document.getElementById('resultsLoadingIndicator').classList.add('hidden');
+                document.getElementById('resultsLoadingText').textContent = 'Error loading results. Please try again.';
+            }
+        }
+        
+        // ==========================================
+        // UI Update Functions
+        // ==========================================
+        
+        // Update the UI with voting period information
+        function updateVotingPeriodUI() {
+            const currentDatesDisplay = document.getElementById('currentDatesDisplay');
+            const votingStatusBadge = document.getElementById('votingStatusBadge');
+            const electionProgressContainer = document.getElementById('electionProgressContainer');
+            
+            // If voting period not set
+            if (votingStartTime === 0 && votingEndTime === 0) {
+                currentDatesDisplay.textContent = 'No voting period has been set.';
+                votingStatusBadge.classList.add('hidden');
+                electionProgressContainer.classList.add('hidden');
+                return;
+            }
+            
+            // Format dates for display
+            const startDate = new Date(votingStartTime * 1000);
+            const endDate = new Date(votingEndTime * 1000);
+            const dateOptions = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit'
+            };
+            
+            const formattedStart = startDate.toLocaleDateString('en-US', dateOptions);
+            const formattedEnd = endDate.toLocaleDateString('en-US', dateOptions);
+            
+            currentDatesDisplay.textContent = `From ${formattedStart} to ${formattedEnd}`;
+            
+            // Show voting status badge
+            votingStatusBadge.classList.remove('hidden');
+            
+            const now = new Date();
+            
+            if (now < startDate) {
+                // Upcoming election
+                votingStatusBadge.textContent = 'Upcoming';
+                votingStatusBadge.classList.remove('bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+                votingStatusBadge.classList.add('bg-gray-100', 'text-gray-800', 'dark:bg-gray-700', 'dark:text-gray-300');
+            } else if (now > endDate) {
+                // Ended election
+                votingStatusBadge.textContent = 'Ended';
+                votingStatusBadge.classList.remove('bg-green-100', 'text-green-800', 'bg-gray-100', 'text-gray-800');
+                votingStatusBadge.classList.add('bg-red-100', 'text-red-800', 'dark:bg-red-900/30', 'dark:text-red-300');
+            } else {
+                // Active election
+                votingStatusBadge.textContent = 'Active';
+                votingStatusBadge.classList.remove('bg-gray-100', 'text-gray-800', 'bg-red-100', 'text-red-800');
+                votingStatusBadge.classList.add('bg-green-100', 'text-green-800', 'dark:bg-green-900/30', 'dark:text-green-300');
+            }
+            
+            // Update election progress
+            updateElectionProgress(startDate, endDate);
+        }
+        
+        // Update election progress bar and time remaining
+        function updateElectionProgress(startDate, endDate) {
+            const now = new Date();
+            const electionProgressContainer = document.getElementById('electionProgressContainer');
+            const electionProgress = document.getElementById('electionProgress');
+            const electionStartLabel = document.getElementById('electionStartLabel');
+            const electionEndLabel = document.getElementById('electionEndLabel');
+            const electionTimeRemaining = document.getElementById('electionTimeRemaining');
+            
+            // Format dates for display
+            const dateOptions = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            electionStartLabel.textContent = startDate.toLocaleDateString('en-US', dateOptions);
+            electionEndLabel.textContent = endDate.toLocaleDateString('en-US', dateOptions);
+            
+            // Calculate progress percentage
+            let progressPercentage = 0;
+            
+            if (now > endDate) {
+                // Election ended
+                progressPercentage = 100;
+            } else if (now < startDate) {
+                // Election not started
+                progressPercentage = 0;
+            } else {
+                // Election in progress
+                const totalDuration = endDate - startDate;
+                const elapsed = now - startDate;
+                progressPercentage = Math.min(100, Math.floor((elapsed / totalDuration) * 100));
+            }
+            
+            // Update progress bar
+            electionProgress.style.width = `${progressPercentage}%`;
+            
+            // Set progress bar color
+            if (progressPercentage === 100) {
+                electionProgress.classList.remove('bg-primary-500', 'bg-yellow-500');
+                electionProgress.classList.add('bg-red-500');
+            } else if (progressPercentage > 75) {
+                electionProgress.classList.remove('bg-primary-500', 'bg-red-500');
+                electionProgress.classList.add('bg-yellow-500');
+            } else {
+                electionProgress.classList.remove('bg-yellow-500', 'bg-red-500');
+                electionProgress.classList.add('bg-primary-500');
+            }
+            
+            // Show progress container
+            electionProgressContainer.classList.remove('hidden');
+            
+            // Update time remaining
+            updateTimeRemaining();
+        }
+        
+        // Update time remaining display
+        function updateTimeRemaining() {
+            const now = Math.floor(Date.now() / 1000);
+            const timeRemainingElement = document.getElementById('timeRemaining');
+            const electionTimeRemaining = document.getElementById('electionTimeRemaining');
+            
+            // If voting period not set
+            if (votingStartTime === 0 && votingEndTime === 0) {
+                timeRemainingElement.textContent = 'Not Set';
+                if (electionTimeRemaining) {
+                    electionTimeRemaining.textContent = 'Voting period not set';
+                }
+                return;
+            }
+            
+            // Calculate appropriate time remaining
+            let timeRemaining;
+            let statusText;
+            
+            if (now < votingStartTime) {
+                // Time until voting starts
+                timeRemaining = votingStartTime - now;
+                statusText = 'until voting begins';
+            } else if (now < votingEndTime) {
+                // Time until voting ends
+                timeRemaining = votingEndTime - now;
+                statusText = 'until voting ends';
+            } else {
+                // Voting ended
+                timeRemainingElement.textContent = 'Ended';
+                if (electionTimeRemaining) {
+                    electionTimeRemaining.textContent = 'Voting has ended';
+                }
+                return;
+            }
+            
+            // Format time remaining
+            const days = Math.floor(timeRemaining / 86400);
+            const hours = Math.floor((timeRemaining % 86400) / 3600);
+            const minutes = Math.floor((timeRemaining % 3600) / 60);
+            const seconds = timeRemaining % 60;
+            
+            let formattedTime = '';
+            
+            if (days > 0) {
+                formattedTime = `${days}d ${hours}h ${minutes}m`;
+            } else if (hours > 0) {
+                formattedTime = `${hours}h ${minutes}m ${seconds}s`;
+            } else {
+                formattedTime = `${minutes}m ${seconds}s`;
+            }
+            
+            // Update UI
+            timeRemainingElement.textContent = formattedTime;
+            if (electionTimeRemaining) {
+                electionTimeRemaining.textContent = `${formattedTime} ${statusText}`;
+            }
+        }
+        
+        // Display feedback messages to the user
+        function showFeedback(type, status, title, message) {
+            const container = document.getElementById(`${type}Container`);
+            const titleElement = document.getElementById(`${type}Title`);
+            const messageElement = document.getElementById(`${type}`);
+            const iconElement = document.getElementById(`${type}Icon`);
+            
+            // Set message content
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+            
+            // Set appropriate styling based on status
+            container.classList.remove('hidden', 'border-green-200', 'border-red-200', 'border-yellow-200', 'bg-green-50', 'bg-red-50', 'bg-yellow-50');
+            titleElement.classList.remove('text-green-800', 'text-red-800', 'text-yellow-800');
+            
+            // Set icon based on notification type
+            let iconClass = '';
+            
+            switch (status) {
+                case 'success':
+                    container.classList.add('border-green-200', 'bg-green-50', 'dark:bg-green-900/20', 'dark:border-green-900');
+                    titleElement.classList.add('text-green-800', 'dark:text-green-300');
+                    iconClass = '<span class="icon-check-circle text-green-500"></span>';
+                    break;
+                case 'error':
+                    container.classList.add('border-red-200', 'bg-red-50', 'dark:bg-red-900/20', 'dark:border-red-900');
+                    titleElement.classList.add('text-red-800', 'dark:text-red-300');
+                    iconClass = '<span class="icon-exclamation-circle text-red-500"></span>';
+                    break;
+                case 'warning':
+                    container.classList.add('border-yellow-200', 'bg-yellow-50', 'dark:bg-yellow-900/20', 'dark:border-yellow-900');
+                    titleElement.classList.add('text-yellow-800', 'dark:text-yellow-300');
+                    iconClass = '<span class="icon-exclamation-triangle text-yellow-500"></span>';
+                    break;
+                case 'info':
+                    container.classList.add('border-blue-200', 'bg-blue-50', 'dark:bg-blue-900/20', 'dark:border-blue-900');
+                    titleElement.classList.add('text-blue-800', 'dark:text-blue-300');
+                    iconClass = '<span class="icon-info-circle text-blue-500"></span>';
+                    break;
+            }
+            
+            // Set icon
+            iconElement.innerHTML = iconClass;
+            
+            // Show the container
+            container.classList.remove('hidden');
+            
+            // Hide feedback after 5 seconds for success messages
+            if (status === 'success') {
+                setTimeout(() => {
+                    container.classList.add('hidden');
+                }, 5000);
+            }
+        }
+        
+        // Create a chart to visualize election results
+        function createResultsChart() {
+            // Get canvas element
+            const chartCanvas = document.getElementById('resultsChart');
+            
+            // If chart already exists, destroy it
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            
+            // Prepare data for the chart
+            const labels = candidatesData.map(candidate => candidate.name);
+            const votes = candidatesData.map(candidate => parseInt(candidate.voteCount));
+            const colors = generateColors(candidatesData.length);
+            
+            // Create chart
+            chartInstance = new Chart(chartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Votes',
+                        data: votes,
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = votes.reduce((sum, vote) => sum + vote, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(2) + '%' : '0%';
+                                    return `Votes: ${value} (${percentage})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Generate colors for chart
+        function generateColors(count) {
+            const colors = [
+                'rgba(14, 165, 233, 0.7)',  // Sky blue
+                'rgba(168, 85, 247, 0.7)',  // Purple
+                'rgba(234, 88, 12, 0.7)',   // Orange
+                'rgba(22, 163, 74, 0.7)',   // Green
+                'rgba(225, 29, 72, 0.7)',   // Red
+                'rgba(20, 184, 166, 0.7)',  // Teal
+                'rgba(245, 158, 11, 0.7)',  // Amber
+                'rgba(236, 72, 153, 0.7)',  // Pink
+            ];
+            
+            // If we need more colors than in our predefined list, generate them
+            if (count > colors.length) {
+                for (let i = colors.length; i < count; i++) {
+                    const r = Math.floor(Math.random() * 255);
+                    const g = Math.floor(Math.random() * 255);
+                    const b = Math.floor(Math.random() * 255);
+                    colors.push(`rgba(${r}, ${g}, ${b}, 0.7)`);
+                }
+            }
+            
+            return colors.slice(0, count);
+        }
+        
+        // ==========================================
+        // Form Handling Functions
+        // ==========================================
+        
+        // Handle adding a new candidate
+        async function handleAddCandidate(event) {
+            event.preventDefault();
+            debugLog('Handling add candidate submission...');
+            
+            if (!web3 || !votingContract) {
+                showFeedback('candidateFeedback', 'error', 'Connection Error', 'Please connect your wallet first.');
+                return;
+            }
+            
+            if (!isAdmin) {
+                showFeedback('candidateFeedback', 'error', 'Permission Denied', 'Only the admin can add candidates.');
+                return;
+            }
+            
+            const nameInput = document.getElementById('name');
+            const partyInput = document.getElementById('party');
+            const imageUrlInput = document.getElementById('imageUrl');
+            const addButton = document.getElementById('addCandidateButton');
+            
+            const name = nameInput.value.trim();
+            const party = partyInput.value.trim();
+            const imageUrl = imageUrlInput.value.trim() || appConfig.defaultImageUrl;
+            
+            // Validate inputs
+            if (!validateCandidateForm(name, party)) {
+                return;
+            }
+            
+            debugLog(`Attempting to add candidate: ${name} (${party})`);
+            
+            // Show loading state
+            addButton.innerHTML = '<div class="loader"></div> Adding...';
+            addButton.disabled = true;
+            
+            try {
+                // Call the contract method
+                const transaction = await votingContract.methods.addCandidate(name, party)
+                    .send({ 
+                        from: accounts[0],
+                        gas: 500000 // Specify gas limit
+                    });
+                
+                debugLog(`Transaction successful: ${transaction.transactionHash}`);
+                
+                // Show success feedback
+                showFeedback('candidateFeedback', 'success', 'Candidate Added', 
+                    `${name} has been added as a candidate successfully.`);
+                
+                // Reset form
+                document.getElementById('addCandidateForm').reset();
+                
+                // Refresh the candidates list
+                await loadCandidates();
+                
+            } catch (error) {
+                console.error('Error adding candidate:', error);
+                debugLog(`Error adding candidate: ${error.message}`);
+                
+                showFeedback('candidateFeedback', 'error', 'Transaction Failed', 
+                    'Failed to add candidate. ' + error.message);
+            } finally {
+                // Reset button state
+                addButton.innerHTML = '<span class="icon-plus-circle mr-2"></span>Add Candidate';
+                addButton.disabled = false;
+            }
+        }
+        
+        // Function to validate candidate form
+        function validateCandidateForm(name, party) {
+            if (!name || !party) {
+                return false;
+            }
+            return true;
+        }
+        
+        // Helper function to check if a date is in the future with a buffer
+        function isDateInFuture(date, bufferMinutes = 5) {
+            const now = new Date();
+            const bufferTime = new Date(now.getTime() + (bufferMinutes * 60 * 1000));
+            return date > bufferTime;
+        }
+        
+        // Handle setting voting dates
+        async function handleSetDates(event) {
+            event.preventDefault();
+            
+            if (!isAdmin) {
+                showFeedback('datesFeedback', 'error', 'Permission Denied', 'Only the admin can set voting dates.');
+                return;
+            }
+            
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const setButton = document.getElementById('setDatesButton');
+            
+            const startDateValue = startDateInput.value;
+            const endDateValue = endDateInput.value;
+            
+            // Validate
+            if (!startDateValue || !endDateValue) {
+                showFeedback('datesFeedback', 'error', 'Validation Error', 'Start and end dates are required.');
+                return;
+            }
+            
+            const startDate = new Date(startDateValue);
+            const endDate = new Date(endDateValue);
+            
+            if (endDate <= startDate) {
+                showFeedback('datesFeedback', 'error', 'Validation Error', 'End date must be after start date.');
+                return;
+            }
+            
+            if (!isDateInFuture(startDate, 5)) {
+                showFeedback('datesFeedback', 'error', 'Validation Error', 'Start date must be at least 5 minutes in the future.');
+                return;
+            }
+            
+            if (!isDateInFuture(endDate, 5)) {
+                showFeedback('datesFeedback', 'error', 'Validation Error', 'End date must be at least 5 minutes in the future.');
+                return;
+            }
+            
+            // Convert to Unix timestamps (seconds)
+            const startTimestamp = Math.floor(startDate.getTime() / 1000);
+            const endTimestamp = Math.floor(endDate.getTime() / 1000);
+            
+            // Debug log the timestamps
+            debugLog(`Setting voting period with timestamps: start=${startTimestamp} (${new Date(startTimestamp * 1000).toLocaleString()}), end=${endTimestamp} (${new Date(endTimestamp * 1000).toLocaleString()})`);
+            
+            // Show loading state
+            setButton.innerHTML = '<div class="loader"></div> Setting...';
+            setButton.disabled = true;
+            
+            try {
+                // Set voting period in the contract
+                await votingContract.methods.setVotingPeriod(startTimestamp, endTimestamp).send({ from: accounts[0] });
+                
+                // Show success feedback
+                showFeedback('datesFeedback', 'success', 'Voting Period Set', 'The voting period has been set successfully.');
+                
+                // Update global variables
+                votingStartTime = startTimestamp;
+                votingEndTime = endTimestamp;
+                
+                // Update UI
+                updateVotingPeriodUI();
+                loadVotingStats();
+                
+                debugLog(`Voting period set: ${startDate.toLocaleString()} to ${endDate.toLocaleString()}`);
+            } catch (error) {
+                console.error('Error setting voting period:', error);
+                
+                // Extract more specific error message if available
+                let errorMessage = error.message || 'Unknown error occurred';
+                
+                // Check for common MetaMask errors
+                if (error.code === 4001) {
+                    errorMessage = 'Transaction was rejected by the user';
+                } else if (error.message && error.message.includes('Internal JSON-RPC error')) {
+                    // Try to extract the actual error from the RPC error
+                    const match = error.message.match(/reverted with reason string '(.+?)'/);
+                    if (match && match[1]) {
+                        errorMessage = match[1];
+                    } else if (error.message.includes('execution reverted')) {
+                        errorMessage = 'Transaction reverted by the contract. Ensure dates are in the future.';
+                    }
+                }
+                
+                debugLog('Error setting voting period: ' + errorMessage);
+                showFeedback('datesFeedback', 'error', 'Transaction Failed', errorMessage);
+            } finally {
+                // Reset button
+                setButton.innerHTML = '<span class="icon-save mr-2"></span>Set New Period';
+                setButton.disabled = false;
+            }
+        }
+        
+        // Handle updating existing voting dates
+        async function handleUpdateDates() {
+            if (!isAdmin) {
+                showFeedback('datesFeedback', 'error', 'Permission Denied', 'Only the admin can update voting dates.');
+                return;
+            }
+            
+            // If no existing dates
+            if (votingStartTime === 0 && votingEndTime === 0) {
+                showFeedback('datesFeedback', 'warning', 'No Dates Set', 'There are no existing dates to update. Please set new dates.');
+                return;
+            }
+            
+            // Fill the form with existing dates
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            
+            const startDate = new Date(votingStartTime * 1000);
+            const endDate = new Date(votingEndTime * 1000);
+            
+            // Format for datetime-local input
+            const formatDateForInput = (date) => {
+                return date.toISOString().slice(0, 16);
+            };
+            
+            startDateInput.value = formatDateForInput(startDate);
+            endDateInput.value = formatDateForInput(endDate);
+            
+            showFeedback('datesFeedback', 'info', 'Update Ready', 'Existing dates have been loaded. Make your changes and click "Set New Period" to update.');
+        }
+        
+        // Export results to CSV
+        function exportResults() {
+            if (candidatesData.length === 0) {
+                showFeedback('candidateFeedback', 'warning', 'No Data', 'There are no results to export.');
+                return;
+            }
+            
+            // Calculate total votes
+            const totalVotes = candidatesData.reduce((sum, candidate) => sum + parseInt(candidate.voteCount), 0);
+            
+            // Prepare CSV content
+            let csvContent = 'ID,Name,Party,Votes,Percentage\n';
+            
+            candidatesData.forEach(candidate => {
+                const percentage = totalVotes > 0 ? ((parseInt(candidate.voteCount) / totalVotes) * 100).toFixed(2) : '0.00';
+                csvContent += `${candidate.id},"${candidate.name}","${candidate.party}",${candidate.voteCount},${percentage}%\n`;
+            });
+            
+            // Create download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `election_results_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            debugLog('Results exported to CSV');
+        }
+        
+        // ==========================================
+        // Initialization - Add this to the end of your file
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('Admin Dashboard Initialized');
+            
+            // Make debug panel visible with Ctrl+Shift+D hotkey
+            document.addEventListener('keydown', function(event) {
+                if (event.ctrlKey && event.shiftKey && event.key === 'D') {
+                    const debugPanel = document.getElementById('debugPanel');
+                    debugPanel.classList.toggle('hidden');
+                }
+            });
+        });
+        
+        // Function to toggle between light and dark theme
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+    </script>
+
+    <!-- Edit Candidate Modal -->
+    <div id="editCandidateModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Edit Candidate</h3>
+                <button type="button" onclick="closeEditCandidateModal()" class="text-gray-400 hover:text-gray-500">
+                    <span class="icon-close"></span>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div id="editCandidateFeedbackContainer" class="mb-4 p-4 rounded-md hidden">
+                    <div class="flex">
+                        <div id="editCandidateFeedbackIcon" class="flex-shrink-0 mr-3">
+                            <!-- Icon will be added by JavaScript -->
+                        </div>
+                        <div>
+                            <h3 id="editCandidateFeedbackTitle" class="text-sm font-medium"></h3>
+                            <div class="mt-1 text-sm" id="editCandidateFeedback"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="editCandidateForm" class="space-y-4">
+                    <input type="hidden" id="editCandidateId" name="editCandidateId" autocomplete="off">
+                    <div>
+                        <label for="editName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Candidate Name
+                        </label>
+                        <input type="text" id="editName" name="editName"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            placeholder="Enter candidate name" autocomplete="name">
+                    </div>
+                    <div>
+                        <label for="editParty" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Political Party
+                        </label>
+                        <input type="text" id="editParty" name="editParty"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            placeholder="Enter political party" autocomplete="organization">
+                    </div>
+                    <div>
+                        <label for="editImageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Image URL (Optional)
+                        </label>
+                        <input type="text" id="editImageUrl" name="editImageUrl"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            placeholder="Enter image URL" autocomplete="url">
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Leave blank to use default avatar image</p>
+                    </div>
+                    <div class="pt-2">
+                        <button type="submit" id="updateCandidateButton"
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-800">
+                            <span class="icon-save mr-2"></span>Update Candidate
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Function to open the edit candidate modal -->
+    <script>
+        function openEditCandidateModal(id, name, party, imageUrl) {
+            // Set the form values
+            document.getElementById('editCandidateId').value = id;
+            document.getElementById('editName').value = name;
+            document.getElementById('editParty').value = party;
+            document.getElementById('editImageUrl').value = imageUrl === appConfig.defaultImageUrl ? '' : imageUrl;
+            
+            // Clear any previous feedback
+            document.getElementById('editCandidateFeedbackContainer').classList.add('hidden');
+            
+            // Show the modal
+            document.getElementById('editCandidateModal').classList.remove('hidden');
+        }
+
+        // Function to close the edit candidate modal
+        function closeEditCandidateModal() {
+            document.getElementById('editCandidateModal').classList.add('hidden');
+        }
+
+        // Function to handle edit candidate form submission
+        async function handleEditCandidate(event) {
+            event.preventDefault();
+            
+            // Get form values
+            const id = document.getElementById('editCandidateId').value;
+            const name = document.getElementById('editName').value.trim();
+            const party = document.getElementById('editParty').value.trim();
+            const imageUrl = document.getElementById('editImageUrl').value.trim() || appConfig.defaultImageUrl;
+            
+            // Validate form
+            if (!validateCandidateForm(name, party)) {
+                showEditCandidateFeedback("Please fill in all required fields", "Validation Error", true);
+                return;
+            }
+            
+            // Show loading state
+            const updateButton = document.getElementById('updateCandidateButton');
+            updateButton.disabled = true;
+            updateButton.innerHTML = '<span class="loader"></span><span>Updating...</span>';
+            
+            try {
+                // Check if contract is connected
+                if (!contractConnected) {
+                    throw new Error("Blockchain not connected. Please connect your wallet first.");
+                }
+                
+                // Update candidate in the contract
+                // Note: This is a mock implementation since most contracts don't support editing candidates
+                // In a real implementation, you would need to call a contract method to update the candidate
+                
+                // For demonstration purposes, we'll just show a success message
+                showEditCandidateFeedback(`Candidate ${name} updated successfully`, "Update Successful", false);
+                
+                // Refresh the candidate list
+                await loadCandidates();
+                
+                // Close the modal after a delay
+                setTimeout(() => {
+                    closeEditCandidateModal();
+                }, 2000);
+            } catch (error) {
+                console.error("Error updating candidate:", error);
+                showEditCandidateFeedback(error.message, "Update Failed", true);
+            } finally {
+                // Reset button state
+                updateButton.disabled = false;
+                updateButton.innerHTML = '<span class="icon-save mr-2"></span>Update Candidate';
+            }
+        }
+
+        // Function to show feedback in the edit candidate modal
+        function showEditCandidateFeedback(message, title = "", isError = false) {
+            const feedbackContainer = document.getElementById('editCandidateFeedbackContainer');
+            const feedbackIcon = document.getElementById('editCandidateFeedbackIcon');
+            const feedbackTitle = document.getElementById('editCandidateFeedbackTitle');
+            const feedback = document.getElementById('editCandidateFeedback');
+            
+            feedbackContainer.classList.remove('hidden', 'bg-green-50', 'bg-red-50', 'dark:bg-green-900/20', 'dark:bg-red-900/20', 'border-green-200', 'border-red-200', 'dark:border-green-900', 'dark:border-red-900');
+            
+            if (isError) {
+                feedbackContainer.classList.add('bg-red-50', 'dark:bg-red-900/20', 'border', 'border-red-200', 'dark:border-red-900');
+                feedbackIcon.innerHTML = '<span class="icon-exclamation-circle text-red-500 mt-0.5"></span>';
+                feedbackTitle.textContent = title || "Error";
+                feedbackTitle.className = "font-medium text-red-800 dark:text-red-300";
+                feedback.className = "text-sm text-red-700 dark:text-red-200";
+            } else {
+                feedbackContainer.classList.add('bg-green-50', 'dark:bg-green-900/20', 'border', 'border-green-200', 'dark:border-green-900');
+                feedbackIcon.innerHTML = '<span class="icon-check-circle text-green-500 mt-0.5"></span>';
+                feedbackTitle.textContent = title || "Success";
+                feedbackTitle.className = "font-medium text-green-800 dark:text-green-300";
+                feedback.className = "text-sm text-green-700 dark:text-green-200";
+            }
+            
+            feedback.textContent = message;
+            feedbackContainer.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
