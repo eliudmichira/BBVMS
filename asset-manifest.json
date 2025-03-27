@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/BBVMS/static/css/main.92c8d4eb.css",
-    "main.js": "/BBVMS/static/js/main.fb690263.js",
-    "index.html": "/BBVMS/index.html",
-    "main.92c8d4eb.css.map": "/BBVMS/static/css/main.92c8d4eb.css.map",
-    "main.fb690263.js.map": "/BBVMS/static/js/main.fb690263.js.map"
+    "main.css": "https://eliudmichira.github.io/BBVMS/static/css/main.92c8d4eb.css",
+    "main.js": "https://eliudmichira.github.io/BBVMS/static/js/main.e52849bf.js",
+    "index.html": "https://eliudmichira.github.io/BBVMS/index.html",
+    "main.92c8d4eb.css.map": "https://eliudmichira.github.io/BBVMS/static/css/main.92c8d4eb.css.map",
+    "main.e52849bf.js.map": "https://eliudmichira.github.io/BBVMS/static/js/main.e52849bf.js.map"
   },
   "entrypoints": [
     "static/css/main.92c8d4eb.css",
-    "static/js/main.fb690263.js"
+    "static/js/main.e52849bf.js"
   ]
 }
