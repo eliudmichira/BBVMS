@@ -2,6 +2,7 @@
   "name": "decentralized-voting",
   "version": "1.0.0",
   "description": "Blockchain-based Electoral Management System",
+  "homepage": "https://eliudmichira.github.io/BBVMS",
   "private": true,
   "dependencies": {
     "@heroicons/react": "^2.0.18",
@@ -22,7 +23,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -44,6 +47,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.1"
   }
