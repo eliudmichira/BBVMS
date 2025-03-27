@@ -31,14 +31,14 @@ jobs:
       - name: Build project
         run: |
           npm run build
+          cp build/index.html build/404.html
         env:
           CI: false
+          PUBLIC_URL: https://eliudmichira.github.io/BBVMS
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
-          commit_message: 'Deploy to GitHub Pages' 
+          folder: build
+          branch: gh-pages
+          clean: true 
