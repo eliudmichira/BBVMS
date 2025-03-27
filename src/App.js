@@ -5,8 +5,11 @@ import Voter from './pages/Voter';
 import Home from './pages/Home';
 
 function App() {
+  // Get the base URL for GitHub Pages
+  const basename = process.env.PUBLIC_URL;
+
   return (
-    <Router>
+    <Router basename={basename}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/admin" element={<Admin />} />
