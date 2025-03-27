@@ -1,66 +1,34 @@
 {
   "name": "decentralized-voting",
   "version": "1.0.0",
-  "description": "-  Implements JWT for secure voter authentication and authorization.\r -  Utilizes Ethereum blockchain for tamper-proof and transparent voting records.\r -  Removes the need for intermediaries, ensuring a trustless voting process.\r -  Admin panel to manage candidates, set voting dates, and monitor results.\r -  Intuitive UI for voters to cast votes and view candidate information.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "start:react": "react-scripts start",
-    "build": "react-scripts build",
-    "serve": "serve -s build"
-  },
-  "author": "",
-  "license": "ISC",
+  "description": "Blockchain-based Electoral Management System",
+  "private": true,
   "dependencies": {
+    "@heroicons/react": "^2.0.18",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
     "@truffle/contract": "^4.6.31",
     "axios": "^1.8.3",
-    "bcryptjs": "^3.0.2",
-    "cheerio": "^1.0.0-rc.12",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
     "ethers": "^6.13.5",
-    "express": "^4.21.2",
-    "express-rate-limit": "^7.5.0",
-    "for": "^0.0.1-dev.0",
-    "helmet": "^8.0.0",
-    "http-proxy-middleware": "^3.0.3",
-    "jsonwebtoken": "^9.0.2",
-    "latest": "^0.2.0",
-    "lucide-react": "^0.482.0",
-    "mongoose": "^8.10.1",
-    "node-fetch": "^2.7.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-scripts": "^5.0.1",
-    "serve": "^14.2.1",
-    "solc": "^0.8.28",
-    "the": "^1.0.2",
-    "version": "^0.1.2",
-    "web3": "^1.10.4",
-    "ws": "^8.18.1"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4",
+    "web3": "^1.10.4"
   },
-  "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "electron": "^34.2.0",
-    "nodemon": "^3.0.3",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^4.0.15"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/eliudmichira/Decentralized-Voting-System.git"
-  },
-  "keywords": [],
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/eliudmichira/Decentralized-Voting-System/issues"
-  },
-  "homepage": "https://github.com/eliudmichira/Decentralized-Voting-System#readme",
-  "resolutions": {
-    "ethers@5.7.2": "^6.13.5",
-    "ethers@4.0.49": "^6.13.5"
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "browserslist": {
     "production": [
@@ -73,5 +41,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.1"
   }
 }
