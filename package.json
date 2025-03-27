@@ -1,9 +1,13 @@
 {
-  "name": "decentralized-voting",
+  "name": "bbvms",
   "version": "1.0.0",
   "description": "Blockchain-based Electoral Management System",
   "homepage": "https://eliudmichira.github.io/BBVMS",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eliudmichira/BBVMS.git"
+  },
   "dependencies": {
     "@heroicons/react": "^2.0.18",
     "@testing-library/jest-dom": "^5.17.0",
