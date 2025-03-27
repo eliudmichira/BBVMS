@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/BBVMS/static/css/main.92c8d4eb.css",
+    "main.js": "/BBVMS/static/js/main.fb690263.js",
+    "index.html": "/BBVMS/index.html",
+    "main.92c8d4eb.css.map": "/BBVMS/static/css/main.92c8d4eb.css.map",
+    "main.fb690263.js.map": "/BBVMS/static/js/main.fb690263.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.92c8d4eb.css",
+    "static/js/main.fb690263.js"
+  ]
+}
